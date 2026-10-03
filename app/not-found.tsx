@@ -1,0 +1,2 @@
+import Link from '@/components/static-link';
+export default function NotFound(){return <main id="main" className="not-found section-pad"><p className="eyebrow">404 / OUT OF ROTATION</p><h1>LOST YOUR<br/><em>WAY?</em></h1><p>Your next favorite tee is still here.</p><Link href="/" className="button dark">Back to SK</Link></main>}
