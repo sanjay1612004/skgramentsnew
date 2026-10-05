@@ -2,8 +2,8 @@ export const site = {
   name: 'SK GARMENTS', logo: 'SK', tagline: 'Wear what feels like you.',
   origin: 'https://sk-garments-studio.sanjaybalaji-k.chatgpt.site',
   description: 'Discover premium T-shirts, oversized fits, graphic tees, and everyday essentials from SK GARMENTS. Contemporary clothing designed for comfort, style, and individuality.',
-  contact: { phone: '+91 88921 28864', whatsapp: '', email: '', address: 'Door 17, Amarajyothi Nagar, Samundipuram', city: 'Tiruppur, Tamil Nadu 641603', hours: 'Contact us for current opening hours.', hoursSourceText: 'User-supplied listing: Closes soon · 8 pm · Opens 9 am Mon. Full weekly schedule not confirmed.', mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Door%2017%2C%20Amarajyothi%20Nagar%2C%20Samundipuram%2C%20Tiruppur%2C%20Tamil%20Nadu%20641603', instagram: 'https://www.instagram.com/skgarments/', tiktok: '', externalCheckout: '' },
-  flags: { showTeam: false, showReviews: false, showStatistics: false, showStore: true, enableBulk: true },
+  contact: { phone: '+91 88921 28864', whatsapp: '', email: 's.kishorebabu8@gmail.com', address: 'Door 17, Amarajyothi Nagar, Samundipuram', city: 'Tiruppur, Tamil Nadu 641603', hours: 'Contact us for current opening hours.', hoursSourceText: 'User-supplied listing: Closes soon · 8 pm · Opens 9 am Mon. Full weekly schedule not confirmed.', mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Door%2017%2C%20Amarajyothi%20Nagar%2C%20Samundipuram%2C%20Tiruppur%2C%20Tamil%20Nadu%20641603', instagram: 'https://www.instagram.com/skgarments/', tiktok: '', externalCheckout: '' },
+  flags: { showTeam: false, showReviews: false, showStatistics: false, showStore: true },
   team: [] as { name: string; role: string; image: string }[],
   testimonials: [] as { quote: string; author: string }[],
   statistics: [] as { value: string; label: string }[],
@@ -21,10 +21,9 @@ export const site = {
       { word: 'DETAIL', text: 'From stitching to print placement, small things change everything.', color: '#efac85' },
       { word: 'ATTITUDE', text: 'Clothes shouldn’t tell you who to be. They should help you show it.', color: '#24251f' }
     ],
-    process: [ { title: 'IDEA', text: 'Every piece starts with a mood, reference, phrase, or visual.' }, { title: 'FIT', text: 'The silhouette is refined around comfort and proportion.' }, { title: 'FABRIC', text: 'Fabric is selected based on the intended feel and structure.' }, { title: 'DETAIL', text: 'Graphics, stitching, labels, and finishing complete the product.' }, { title: 'WEAR IT', text: 'The final piece becomes whatever you make it.' } ],
     fabric: { headline: 'FEEL THE DIFFERENCE.', text: 'The little things you feel. Every time you wear it.', specifications: ['Weight, composition, and care details are confirmed for each product before ordering.'] }
   },
-  privacy: 'Your bag and preferences are stored only in this browser. This site does not collect enquiries on a server. If you choose an external contact service, that service receives the information you send.',
+  privacy: 'When you submit a quote, your email and message are sent through FormSubmit to SK GARMENTS so we can respond. FormSubmit processes the submission under its privacy policy. Other enquiry links use the selected external contact service.',
   terms: 'The displayed collection and imagery are concepts. Availability, product specifications, prices, payment, shipping, and returns must be confirmed directly with SK GARMENTS. Preparing an enquiry does not confirm an order.'
 };
 export const fits = [
@@ -32,11 +31,4 @@ export const fits = [
   { id: 'Relaxed', label: 'Room to move.', description: 'More ease through the chest and sleeves. An easy middle ground between regular and oversized.', x: .94, y: 1 },
   { id: 'Oversized', label: 'Big proportions. Easy energy.', description: 'A roomy body, generous sleeves, and dropped shoulders. Choose your usual size for the intended look.', x: 1.1, y: 1.04 },
   { id: 'Boxy', label: 'Wide. Clean. Considered.', description: 'A wider body with a shorter length. Check the product measurements to get the proportions right.', x: 1.08, y: .87 }
-];
-export const lookbook = [
-  { title: 'EVERYDAY', note: 'Your daily uniform, reimagined.', product: 'core-minimal', scene: 0 },
-  { title: 'OVERSIZED', note: 'A little more room to be you.', product: 'essential-oversized', scene: 1 },
-  { title: 'GRAPHIC', note: 'Let the back do the talking.', product: 'after-dark', scene: 2 },
-  { title: 'LAYERED', note: 'Same tee. A different story.', product: 'everyday-regular', scene: 3 },
-  { title: 'YOUR WAY', note: 'The only rule: make it yours.', product: 'studio-box', scene: 4 }
 ];

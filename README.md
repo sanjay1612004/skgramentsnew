@@ -1,6 +1,6 @@
 # SK GARMENTS
 
-An editorial, interactive fashion website built with Next.js App Router, TypeScript, Tailwind CSS, Framer Motion, and Lucide. All ten content routes export as static files. No database, authentication, API routes, server actions, or payment processing are used.
+An editorial, interactive fashion website built with Next.js App Router, TypeScript, Tailwind CSS, Framer Motion, and Lucide. Content routes export as static files. No database, authentication, API routes, server actions, or payment processing are used.
 
 ## Run and export
 
@@ -16,7 +16,9 @@ An editorial, interactive fashion website built with Next.js App Router, TypeScr
 - `data/collections.ts`: collection themes and descriptions.
 - `data/faqs.ts`: FAQs.
 
-Set `site.contact.whatsapp` to a real international number, or set `email` or `externalCheckout`. These enable external enquiry links. Until a contact is configured, visitors can prepare and copy an enquiry. No message is sent automatically. Instagram comes from the supplied brief.
+Set `site.contact.whatsapp` to a real international number, or update `email` for business enquiries. Product and bulk enquiries open the Get a Quote modal. Instagram comes from the supplied brief.
+
+The Get a Quote modal sends directly from the website through FormSubmit’s AJAX endpoint to `site.contact.email` (currently `s.kishorebabu8@gmail.com`). The first submission triggers an activation email: the inbox owner must click **Activate Form** before quote delivery works. If activation is pending, the form shows an error and preserves the entered details for retry. Submit a quote again after activation and verify it arrives in the inbox. Browser tests intercept the endpoint and do not send real emails. No email app opens. Visitors see sending, confirmation, and recoverable failure states in the modal. FormSubmit is an external service; see [its setup documentation](https://formsubmit.co/).
 
 The address and phone are supplied by the business owner: Door 17, Amarajyothi Nagar, Samundipuram, Tiruppur, Tamil Nadu 641603; +91 88921 28864. The location section and map directions are enabled. The shared listing status does not establish a full weekly schedule, so visitors are asked to call for current opening hours. WhatsApp is not assumed from a phone number.
 
@@ -34,9 +36,9 @@ Each product can have its own size chart in `measurements`: `{ S: { chest: 50, l
 
 ## Interaction and accessibility
 
-Floating cursor-reactive hero; scroll-reactive marquee; product index; expanding product comparison; front/back slider; fit morph; sticky FIT/FABRIC/DETAIL/ATTITUDE story; rotating graphic tee; fabric zoom; color environment switching; horizontal lookbook; animated thread; magnetic buttons; frontend bag; product/bulk enquiry draft; animated FAQ.
+Floating cursor-reactive hero; scroll-reactive marquee; product index; expanding product comparison; front/back slider; fit morph; sticky FIT/FABRIC/DETAIL/ATTITUDE story; 3D hoodie; fabric zoom; color environment switching; responsive manufacturing and dispatch video; animated thread; magnetic buttons; quote modal; animated FAQ; full-width store visit section.
 
-The bag uses device-local `localStorage` only. Dialogs trap focus, restore focus, and close with Escape. Buttons have labels and visible focus rings. Mobile replaces desktop hover with tap and horizontal scroll with touch swiping. Reduced-motion preference removes major scroll, cursor, and rotation effects while keeping content usable. GSAP is omitted because Framer Motion handles the required effects without a second animation runtime.
+Dialogs trap focus, restore focus, and close with Escape. The native quote dialog uses GSAP for the card, brand panel, text, and form entrance, plus its success and closing animations. Buttons have labels and visible focus rings. Mobile replaces desktop hover with tap and horizontal scroll with touch swiping. Reduced-motion preference removes major scroll, cursor, rotation, and quote animation effects while keeping content usable.
 
 ## Publish
 
