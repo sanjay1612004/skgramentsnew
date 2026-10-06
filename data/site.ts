@@ -9,7 +9,8 @@ export const site = {
   statistics: [] as { value: string; label: string }[],
   shipping: 'Shipping and payment options depend on your location and selected ordering method. Ask for the current options before placing an order.',
   returns: 'Exchange and return terms will be confirmed with your enquiry before an order is placed.',
-  story: 'SK GARMENTS exists to make everyday clothing feel more considered — better fits, stronger identity, and pieces you’ll actually want to wear again.',
+  about: { establishedYear: 2016, ordersHandled: 200, workshopCopy: 'Our shop is where ideas become garments. From everyday T-shirts to custom printing and embroidered details, we bring your requirements into the conversation and help you find a style that feels like yours.' },
+  story: 'Established in 2016, SK GARMENTS is based in Tiruppur, Tamil Nadu. With 200+ orders handled, our story is built around the garments we make and the people we make them for.',
   copy: {
     hero: ['WEAR', 'YOUR', 'ATTITUDE.'], intro: 'We make the T-shirts you reach for first.', introBody: 'Good fabric. Better fits. Strong graphics. No unnecessary noise.',
     heroBody: 'Premium everyday T-shirts designed for comfort, expression, and effortless style. Welcome to SK GARMENTS.',
