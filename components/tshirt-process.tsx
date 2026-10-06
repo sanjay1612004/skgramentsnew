@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion';
+import { motion, useMotionValueEvent, useScroll, useTransform, type MotionValue } from 'framer-motion';
+import { useReducedMotionPreference } from '@/lib/use-reduced-motion';
 import { ArrowDown, Check } from 'lucide-react';
 import './tshirt-process.css';
 
@@ -38,7 +39,7 @@ export default function TShirtProcess() {
   const root = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
   const lastStage = useRef(0);
-  const reduced = useReducedMotion();
+  const reduced = useReducedMotionPreference();
   const { scrollYProgress } = useScroll({ target: root, offset: ['start start', 'end end'] });
   useMotionValueEvent(scrollYProgress, 'change', value => {
     if (reduced) return;

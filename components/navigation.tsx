@@ -7,7 +7,7 @@ import { useModal } from './modal-provider';
 import { site } from '@/data/site';
 import { getWhatsAppUrl } from '@/lib/contact';
 import WhatsAppIcon from './whatsapp-icon';
-const links = [{ name: 'T-Shirts', href: '/#shop' },{ name: 'Collections', href: '/#collections' },{ name: 'Bulk orders', href: '/bulk-tshirt-orders/' },{ name: 'About', href: '/#about' },{ name: 'FAQ', href: '/#faq' }];
+const links = [{ name: 'T-Shirts', href: '/#shop' },{ name: 'Bulk orders', href: '/bulk-tshirt-orders/' },{ name: 'About', href: '/#about' },{ name: 'FAQ', href: '/#faq' }];
 export default function Navigation() {
  const [scrolled,setScrolled]=useState(false),[menu,setMenu]=useState(false); const modal=useModal(), reduced=useReducedMotion();
  useEffect(()=>{

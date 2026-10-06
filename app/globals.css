@@ -159,3 +159,12 @@ body:has(.quote-modal[open]){overflow:hidden}
 
 /* Bulk buying links extend the existing editorial navigation and product pages. */
 .collection-bulk-link{margin-top:24px;font-size:.9375rem}.product-bulk-link{margin-top:18px}.product-bulk-link .text-link{font-size:.875rem}.hero-title .attitude{font-size:12.7vw}@media(min-width:1600px){.hero-title .attitude{font-size:203px}}@media(max-width:1000px) and (min-width:761px){.desktop-nav{gap:18px}.navigation{gap:18px}.nav-actions{gap:16px}}@media(max-width:760px){.hero-title .hero-word:nth-child(2){font-size:17.5vw;white-space:nowrap}.hero-title .attitude{font-size:15.4vw}.hero-buttons .text-link{font-size:.9375rem}.collection-bulk-link .text-link{font-size:.875rem}}
+
+/* Give the bulk-order headline more breathing room without moving the hero artwork. */
+.hero-title{font-size:11.8vw;min-height:36vw}
+.hero-title .attitude{font-size:10.8vw}
+@media(min-width:1600px){.hero-title{font-size:188px;min-height:576px}.hero-title .attitude{font-size:173px}}
+@media(max-width:760px){.hero-title{font-size:18vw;min-height:0}.hero-title .hero-word:nth-child(2){font-size:15.3vw}.hero-title .attitude{font-size:13.3vw}}
+
+/* Keep a real hoodie preview visible while the smaller interactive model warms up. */
+.graphic-model{contain:layout paint}.graphic-model-poster{position:absolute;inset:0;pointer-events:none;transition:opacity .3s,visibility .3s}.graphic-model-poster img{object-fit:contain}.graphic-model .graphic-model-viewer{opacity:0;transition:opacity .3s}.graphic-model[data-status="ready"] .graphic-model-poster{opacity:0;visibility:hidden}.graphic-model[data-status="ready"] .graphic-model-viewer{opacity:1}.graphic-model .graphic-model-status{inset:auto 12px 12px;padding:8px 12px;font-size:.8125rem;min-height:36px}.graphic-model-status button{pointer-events:auto;text-decoration:underline;text-underline-offset:3px;padding:6px}.graphic-model[data-status="error"] .graphic-model-status{background:var(--lavender)}@media(prefers-reduced-motion:reduce){.graphic-model-poster,.graphic-model .graphic-model-viewer{transition:none}}

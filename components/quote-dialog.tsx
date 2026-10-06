@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Check, LoaderCircle, Mail, X } from 'lucide-react';
 import { gsap } from 'gsap';
 import { site } from '@/data/site';
+import { sendBrandedQuote, sendQuoteCopies } from '@/lib/quote-delivery';
 
 export type QuoteDetails = { product?: string; color?: string; size?: string };
 
@@ -19,6 +20,8 @@ export default function QuoteDialog({ details, close }: { details: QuoteDetails;
   const animationRef = useRef<gsap.core.Timeline | null>(null);
   const closingRef = useRef(false);
   const requestRef = useRef<AbortController | null>(null);
+  const deliveryRef = useRef<{ key: string; accepted: Set<string> }>({ key: '', accepted: new Set() });
+  const brandedDeliveryRef = useRef({ key: '', requestId: '' });
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [replyEmail, setReplyEmail] = useState('');
@@ -124,11 +127,7 @@ export default function QuoteDialog({ details, close }: { details: QuoteDetails;
     setStatus('sending');
     setErrorMessage('');
     try {
-      const response = await fetch(`https://formsubmit.co/ajax/${site.contact.email}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
+      const payload: Record<string, string> = {
           email,
           ...(phone ? { 'Phone number': phone } : {}),
           'Request subject': subject,
@@ -141,15 +140,33 @@ export default function QuoteDialog({ details, close }: { details: QuoteDetails;
           _template: 'table',
           _captcha: 'false',
           _honey: String(form.get('_honey') || ''),
-        }),
-      });
-      const result = await response.json();
-      if (requestRef.current !== controller) return;
-      if (/activat|confirm.{0,30}email|verif/i.test(String(result.message || ''))) {
-        throw new Error('Quote delivery is awaiting confirmation from SK GARMENTS. Please try again shortly or call us.');
+      };
+      const key = JSON.stringify(payload);
+      const brandedEndpoint = process.env.NEXT_PUBLIC_QUOTE_API_URL?.trim();
+      if (brandedEndpoint) {
+        if (brandedDeliveryRef.current.key !== key) brandedDeliveryRef.current = { key, requestId: crypto.randomUUID() };
+        await sendBrandedQuote(brandedEndpoint, { requestId: brandedDeliveryRef.current.requestId, email, phone, subject, message, ...details, honey: String(form.get('_honey') || '') }, controller.signal);
+        if (requestRef.current !== controller) return;
+        setReplyEmail(email);
+        setStatus('success');
+        return;
       }
-      if (!response.ok || !(result.success === true || result.success === 'true')) {
-        throw new Error('Your quote could not be sent. Please try again or call SK GARMENTS.');
+      if (deliveryRef.current.key !== key) deliveryRef.current = { key, accepted: new Set() };
+      const recipients = [...new Set([site.contact.email, ...site.contact.quoteAdditionalRecipients])];
+      const pending = recipients.filter(recipient => !deliveryRef.current.accepted.has(recipient));
+      const result = await sendQuoteCopies(pending, payload, controller.signal);
+      if (requestRef.current !== controller) return;
+      result.accepted.forEach(recipient => deliveryRef.current.accepted.add(recipient));
+      if (result.failures.length) {
+        const partial = deliveryRef.current.accepted.size > 0;
+        const activation = result.failures.some(failure => failure.reason === 'activation');
+        throw new Error(activation
+          ? partial
+            ? 'Your request reached SK GARMENTS. An additional copy is awaiting confirmation from the shop. Please call us or try again later.'
+            : 'Quote delivery is awaiting confirmation from SK GARMENTS. Please try again shortly or call us.'
+          : partial
+            ? 'Your request reached SK GARMENTS, but an additional copy could not be submitted. Please retry to complete it or call us.'
+            : 'Your quote could not be sent. Please check your connection and try again or call SK GARMENTS.');
       }
       setReplyEmail(email);
       setStatus('success');

@@ -2,7 +2,7 @@ export const site = {
   name: 'SK GARMENTS', logo: 'SK', tagline: 'Wear what feels like you.',
   origin: (process.env.NEXT_PUBLIC_SITE_URL || 'https://sk-garments-studio.sanjaybalaji-k.chatgpt.site').replace(/\/$/, ''),
   description: 'Bulk T-shirt orders and wholesale garments from SK GARMENTS in Tiruppur. Enquire about custom screen printing, embroidery and DTF printing. Get a quote.',
-  contact: { phone: '9344856330', whatsapp: '9344856330', email: 's.kishorebabu8@gmail.com', address: 'Door 17, Amarajyothi Nagar, Samundipuram', city: 'Tiruppur, Tamil Nadu 641603', hours: 'Contact us for current opening hours.', hoursSourceText: 'User-supplied listing: Closes soon · 8 pm · Opens 9 am Mon. Full weekly schedule not confirmed.', mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Door%2017%2C%20Amarajyothi%20Nagar%2C%20Samundipuram%2C%20Tiruppur%2C%20Tamil%20Nadu%20641603', instagram: 'https://www.instagram.com/skgarments/', tiktok: '', externalCheckout: '' },
+  contact: { phone: '9344856330', whatsapp: '9344856330', email: 's.kishorebabu8@gmail.com', quoteAdditionalRecipients: ['shivajiksgarments@gmail.com'], address: 'Door 17, Amarajyothi Nagar, Samundipuram', city: 'Tiruppur, Tamil Nadu 641603', hours: 'Contact us for current opening hours.', hoursSourceText: 'User-supplied listing: Closes soon · 8 pm · Opens 9 am Mon. Full weekly schedule not confirmed.', mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Door%2017%2C%20Amarajyothi%20Nagar%2C%20Samundipuram%2C%20Tiruppur%2C%20Tamil%20Nadu%20641603', instagram: 'https://www.instagram.com/skgarments/', tiktok: '', externalCheckout: '' },
   flags: { showTeam: false, showReviews: false, showStatistics: false, showStore: true },
   team: [] as { name: string; role: string; image: string }[],
   testimonials: [] as { quote: string; author: string }[],
@@ -24,7 +24,7 @@ export const site = {
     ],
     fabric: { headline: 'FEEL THE DIFFERENCE.', text: 'The little things you feel. Every time you wear it.', specifications: ['Weight, composition, and care details are confirmed for each product before ordering.'] }
   },
-  privacy: 'When you submit a quote, your email and message are sent through FormSubmit to SK GARMENTS so we can respond. FormSubmit processes the submission under its privacy policy. Other enquiry links use the selected external contact service.',
+  privacy: process.env.NEXT_PUBLIC_QUOTE_API_URL ? 'When you submit a quote, your email, optional phone number and message are sent to SK GARMENTS through our email service using Gmail so we can respond. Other enquiry links use the selected external contact service.' : 'When you submit a quote, your email and message are sent through FormSubmit to SK GARMENTS so we can respond. FormSubmit processes the submission under its privacy policy. Other enquiry links use the selected external contact service.',
   terms: 'The displayed collection and imagery are concepts. Availability, product specifications, prices, payment, shipping, and returns must be confirmed directly with SK GARMENTS. Preparing an enquiry does not confirm an order.'
 };
 export const fits = [
