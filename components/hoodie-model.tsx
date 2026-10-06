@@ -33,11 +33,11 @@ export default function HoodieModel() {
     const observer = new IntersectionObserver((entries) => {
       if (!entries.some((entry) => entry.isIntersecting)) return;
       observer.disconnect();
-      // Register the browser-only custom element when the section is nearby.
+      // Load the large model when visible, keeping neighboring sections smooth.
       import('@google/model-viewer')
         .then(() => { if (!cancelled) setActive(true); })
         .catch(() => { if (!cancelled) failed(); });
-    }, { rootMargin: '300px' });
+    }, { rootMargin: '0px' });
     observer.observe(wrapper);
 
     return () => {
@@ -68,7 +68,7 @@ export default function HoodieModel() {
         'shadow-intensity': '0.8',
         'environment-image': 'neutral',
         'interaction-prompt': 'none',
-        loading: 'eager',
+        loading: 'lazy',
       }, <span slot="progress-bar" />)}
       {status !== 'ready' && (
         <div className="graphic-model-status" role="status">

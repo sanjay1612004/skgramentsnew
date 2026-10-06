@@ -16,9 +16,11 @@ An editorial, interactive fashion website built with Next.js App Router, TypeScr
 - `data/collections.ts`: collection themes and descriptions.
 - `data/faqs.ts`: FAQs.
 
-Set `site.contact.whatsapp` to a real international number, or update `email` for business enquiries. Product and bulk enquiries open the Get a Quote modal. Instagram comes from the supplied brief.
+Set `site.contact.whatsapp` to the business number (10-digit Indian numbers receive the +91 country code automatically), or update `email` for business enquiries. Product and bulk enquiries open the Get a Quote modal. Instagram comes from the supplied brief.
 
 The Get a Quote modal sends directly from the website through FormSubmit’s AJAX endpoint to `site.contact.email` (currently `s.kishorebabu8@gmail.com`). The first submission triggers an activation email: the inbox owner must click **Activate Form** before quote delivery works. If activation is pending, the form shows an error and preserves the entered details for retry. Submit a quote again after activation and verify it arrives in the inbox. Browser tests intercept the endpoint and do not send real emails. No email app opens. Visitors see sending, confirmation, and recoverable failure states in the modal. FormSubmit is an external service; see [its setup documentation](https://formsubmit.co/).
+
+Quote submissions include email, an optional phone number, the request subject, selected product/color/size when available, and the message. The owner email uses FormSubmit's table template with clear field labels and a “New quote request” subject. The explicit source URL field is omitted, and Reply-To remains the customer's email address.
 
 The address and phone are supplied by the business owner: Door 17, Amarajyothi Nagar, Samundipuram, Tiruppur, Tamil Nadu 641603; +91 88921 28864. The location section and map directions are enabled. The shared listing status does not establish a full weekly schedule, so visitors are asked to call for current opening hours. WhatsApp is not assumed from a phone number.
 
@@ -36,7 +38,11 @@ Each product can have its own size chart in `measurements`: `{ S: { chest: 50, l
 
 ## Interaction and accessibility
 
-Floating cursor-reactive hero; scroll-reactive marquee; product index; expanding product comparison; front/back slider; fit morph; sticky FIT/FABRIC/DETAIL/ATTITUDE story; 3D hoodie; fabric zoom; color environment switching; responsive manufacturing and dispatch video; animated thread; magnetic buttons; quote modal; animated FAQ; full-width store visit section.
+Floating cursor-reactive hero; scroll-reactive marquee; product index; expanding product comparison; front/back slider; fit morph; sticky FIT/FABRIC/DETAIL/ATTITUDE story; Print & Stitch Studio with animated equipment tabs; 3D hoodie; fabric zoom; scroll-driven T-shirt making illustrations; animated thread; magnetic buttons; quote modal; animated FAQ; full-width store visit section with a Google Map for the configured address. The floating WhatsApp shortcut and footer link open a prefilled enquiry to the configured business number.
+
+The studio showcases the user-supplied screen printing, embroidery, and DTF equipment images with lightweight entrance, hover, and fade animations. Keyboard-accessible tabs keep the selected service linked to its quote. Responsive WebP images use smaller mobile copies, and reduced motion disables the transitions. The neighboring hoodie model loads only when visible.
+
+The making section replaces the colour showcase with the user-supplied Cutting, Stitching, Ironing, Packing, and Dispatch illustrations. Its five dots indicate scroll progress rather than act as colour selectors. One sticky viewport follows scroll position with small transform and opacity transitions; WebP assets preserve the original artwork and transparency. Reduced motion displays all five stages in a normal list.
 
 Dialogs trap focus, restore focus, and close with Escape. The native quote dialog uses GSAP for the card, brand panel, text, and form entrance, plus its success and closing animations. Buttons have labels and visible focus rings. Mobile replaces desktop hover with tap and horizontal scroll with touch swiping. Reduced-motion preference removes major scroll, cursor, rotation, and quote animation effects while keeping content usable.
 

@@ -2,6 +2,8 @@ import { ArrowUpRight, Clock3, MapPin, Phone } from 'lucide-react';
 import { site } from '@/data/site';
 
 export default function StoreLocation() {
+  const mapQuery = `${site.contact.address}, ${site.contact.city}`;
+  const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=16&output=embed`;
   const phoneUrl = `tel:${site.contact.phone.replace(/[^+\d]/g, '')}`;
 
   return (
@@ -29,18 +31,20 @@ export default function StoreLocation() {
         <p className="store-hours"><Clock3 size={14} strokeWidth={1.5} aria-hidden="true" />{site.contact.hours}</p>
       </div>
 
-      <div className="store-location-mark" aria-hidden="true">
-        <div className="store-art-top"><span>THE PLACE WE CALL HOME</span><ArrowUpRight size={21} strokeWidth={1} /></div>
-        <div className="store-brand-art">
-          <svg className="store-contours" viewBox="0 0 500 500" fill="none">
-            {[210, 175, 140, 105].map(radius => <ellipse key={radius} cx="250" cy="250" rx={radius} ry={radius * 1.28} transform="rotate(35 250 250)" />)}
-            <path d="M0 250H500M250 0V500" strokeDasharray="2 9" />
-          </svg>
-          <span className="store-art-star">✳</span>
-          <strong>SK</strong>
-          <span className="store-art-signature">EVERYDAY FITS. MADE DIFFERENTLY.</span>
+      <div className="store-map-panel">
+        <div className="store-map-heading">
+          <span className="store-map-eyebrow"><span aria-hidden="true" /> THE PLACE WE CALL HOME</span>
+          <h4>Find us in <em>Tiruppur.</em></h4>
+          <p>A little closer to your next favourite.</p>
         </div>
-        <div className="store-art-bottom"><div><span>ROOTED IN</span><strong>TIRUPPUR.</strong></div><span className="store-origin">TAMIL NADU<br />INDIA</span></div>
+        <div className="store-map-frame">
+          <iframe src={mapEmbedUrl} title="Google Map showing the SK GARMENTS shop address in Tiruppur" loading="lazy" allowFullScreen referrerPolicy="no-referrer-when-downgrade" />
+        </div>
+        <div className="store-map-footer">
+          <div className="store-map-pin"><MapPin size={20} strokeWidth={1.5} aria-hidden="true" /></div>
+          <div><strong>SK GARMENTS</strong><span>Amarajyothi Nagar · Samundipuram</span></div>
+          {site.contact.mapsUrl && <a href={site.contact.mapsUrl} target="_blank" rel="noopener noreferrer" aria-label="Open the SK GARMENTS shop address in Google Maps"><span>Open in Google Maps</span><ArrowUpRight size={20} aria-hidden="true" /></a>}
+        </div>
       </div>
     </section>
   );

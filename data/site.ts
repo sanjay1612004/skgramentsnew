@@ -2,7 +2,7 @@ export const site = {
   name: 'SK GARMENTS', logo: 'SK', tagline: 'Wear what feels like you.',
   origin: 'https://sk-garments-studio.sanjaybalaji-k.chatgpt.site',
   description: 'Discover premium T-shirts, oversized fits, graphic tees, and everyday essentials from SK GARMENTS. Contemporary clothing designed for comfort, style, and individuality.',
-  contact: { phone: '+91 88921 28864', whatsapp: '', email: 's.kishorebabu8@gmail.com', address: 'Door 17, Amarajyothi Nagar, Samundipuram', city: 'Tiruppur, Tamil Nadu 641603', hours: 'Contact us for current opening hours.', hoursSourceText: 'User-supplied listing: Closes soon · 8 pm · Opens 9 am Mon. Full weekly schedule not confirmed.', mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Door%2017%2C%20Amarajyothi%20Nagar%2C%20Samundipuram%2C%20Tiruppur%2C%20Tamil%20Nadu%20641603', instagram: 'https://www.instagram.com/skgarments/', tiktok: '', externalCheckout: '' },
+  contact: { phone: '9344856330', whatsapp: '9344856330', email: 's.kishorebabu8@gmail.com', address: 'Door 17, Amarajyothi Nagar, Samundipuram', city: 'Tiruppur, Tamil Nadu 641603', hours: 'Contact us for current opening hours.', hoursSourceText: 'User-supplied listing: Closes soon · 8 pm · Opens 9 am Mon. Full weekly schedule not confirmed.', mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Door%2017%2C%20Amarajyothi%20Nagar%2C%20Samundipuram%2C%20Tiruppur%2C%20Tamil%20Nadu%20641603', instagram: 'https://www.instagram.com/skgarments/', tiktok: '', externalCheckout: '' },
   flags: { showTeam: false, showReviews: false, showStatistics: false, showStore: true },
   team: [] as { name: string; role: string; image: string }[],
   testimonials: [] as { quote: string; author: string }[],
