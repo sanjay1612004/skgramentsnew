@@ -4,5 +4,19 @@ import { site } from '@/data/site';
 import ModalProvider from '@/components/modal-provider';
 import Navigation from '@/components/navigation';
 import Footer from '@/components/footer';
-export const metadata: Metadata = { metadataBase: new URL(site.origin), title: { default: 'SK GARMENTS | Premium T-Shirts & Everyday Streetwear', template: '%s | SK GARMENTS' }, description: site.description, alternates: { canonical: '/' }, openGraph: { title: 'SK GARMENTS | Wear what feels like you.', description: site.description, type: 'website', siteName: site.name, locale: 'en_IN' }, twitter: { card: 'summary', title: 'SK GARMENTS', description: site.description }, icons: { icon: '/favicon.svg' } };
-export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en"><body><ModalProvider><Navigation/>{children}<Footer/></ModalProvider><script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({'@context':'https://schema.org','@type':'Organization',name:site.name,url:site.origin,sameAs:[site.contact.instagram],...(site.contact.phone?{telephone:site.contact.phone}:{}),...(site.contact.address?{address:{'@type':'PostalAddress',streetAddress:site.contact.address,addressLocality:'Tiruppur',addressRegion:'Tamil Nadu',postalCode:'641603',addressCountry:'IN'}}:{}),...(site.contact.email?{email:site.contact.email}:{})}).replace(/</g,'\\u003c')}}/></body></html>}
+import { businessStructuredData, homeTitle, jsonLd } from '@/lib/seo';
+
+export const metadata: Metadata = {
+  metadataBase: new URL(site.origin),
+  title: { default: homeTitle, template: '%s | SK GARMENTS' },
+  description: site.description,
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
+  verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined },
+  openGraph: { title: homeTitle, description: site.description, type: 'website', siteName: site.name, locale: 'en_IN' },
+  twitter: { card: 'summary', title: homeTitle, description: site.description },
+  icons: { icon: '/favicon.svg' },
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return <html lang="en-IN"><body><ModalProvider><Navigation />{children}<Footer /></ModalProvider><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(businessStructuredData()) }} /></body></html>;
+}

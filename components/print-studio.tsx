@@ -53,7 +53,7 @@ export default function PrintStudio() {
         <motion.div className="studio-copy" initial={reduced ? false : { opacity: 0, y: 35 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: .2 }} transition={{ duration: .8, ease }}>
           <p className="studio-eyebrow">YOUR ARTWORK. OUR CRAFT.</p>
           <h2 id="studio-title" className="studio-heading">Print. Stitch.<br /><span>Stand out.</span></h2>
-          <p className="studio-intro">From a bold graphic to a finely stitched logo. Three ways to make a garment unmistakably yours.</p>
+          <p className="studio-intro">Custom screen printing, embroidery and DTF printing for bulk T-shirt orders. Three ways to make your brand part of the garment.</p>
           <button type="button" className="studio-quote" onClick={() => modal.openQuote({ product: `${services[active].title} for custom garments` })}>Let’s create yours <ArrowUpRight size={19} aria-hidden="true" /></button>
           <p className="studio-note">Have a design in mind? Let’s find its finish.</p>
         </motion.div>

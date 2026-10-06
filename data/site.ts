@@ -1,7 +1,7 @@
 export const site = {
   name: 'SK GARMENTS', logo: 'SK', tagline: 'Wear what feels like you.',
-  origin: 'https://sk-garments-studio.sanjaybalaji-k.chatgpt.site',
-  description: 'Discover premium T-shirts, oversized fits, graphic tees, and everyday essentials from SK GARMENTS. Contemporary clothing designed for comfort, style, and individuality.',
+  origin: (process.env.NEXT_PUBLIC_SITE_URL || 'https://sk-garments-studio.sanjaybalaji-k.chatgpt.site').replace(/\/$/, ''),
+  description: 'Bulk T-shirt orders and wholesale garments from SK GARMENTS in Tiruppur. Enquire about custom screen printing, embroidery and DTF printing. Get a quote.',
   contact: { phone: '9344856330', whatsapp: '9344856330', email: 's.kishorebabu8@gmail.com', address: 'Door 17, Amarajyothi Nagar, Samundipuram', city: 'Tiruppur, Tamil Nadu 641603', hours: 'Contact us for current opening hours.', hoursSourceText: 'User-supplied listing: Closes soon · 8 pm · Opens 9 am Mon. Full weekly schedule not confirmed.', mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Door%2017%2C%20Amarajyothi%20Nagar%2C%20Samundipuram%2C%20Tiruppur%2C%20Tamil%20Nadu%20641603', instagram: 'https://www.instagram.com/skgarments/', tiktok: '', externalCheckout: '' },
   flags: { showTeam: false, showReviews: false, showStatistics: false, showStore: true },
   team: [] as { name: string; role: string; image: string }[],
@@ -12,9 +12,9 @@ export const site = {
   about: { establishedYear: 2016, ordersHandled: 200, workshopCopy: 'Our shop is where ideas become garments. From everyday T-shirts to custom printing and embroidered details, we bring your requirements into the conversation and help you find a style that feels like yours.' },
   story: 'Established in 2016, SK GARMENTS is based in Tiruppur, Tamil Nadu. With 200+ orders handled, our story is built around the garments we make and the people we make them for.',
   copy: {
-    hero: ['WEAR', 'YOUR', 'ATTITUDE.'], intro: 'We make the T-shirts you reach for first.', introBody: 'Good fabric. Better fits. Strong graphics. No unnecessary noise.',
-    heroBody: 'Premium everyday T-shirts designed for comfort, expression, and effortless style. Welcome to SK GARMENTS.',
-    brandBody: 'SK GARMENTS creates contemporary everyday clothing designed to feel effortless from the moment you put it on.',
+    hero: ['BULK', 'T-SHIRTS', 'YOUR WAY.'], intro: 'Bulk T-shirt orders. Made personal.', introBody: 'Your quantity. Your artwork. A fit for your whole crew.',
+    heroBody: 'Bulk T-shirt orders and wholesale garment enquiries in Tiruppur. Custom printing and embroidery for your brand, team or event.',
+    brandBody: 'Established in 2016, SK GARMENTS works with bulk buyers and wholesalers from our shop in Tiruppur, Tamil Nadu. Share your garment, quantity and design requirements to get a quote.',
     final: 'YOUR NEXT FAVORITE TEE IS RIGHT HERE.',
     principles: [
       { word: 'FIT', text: 'Built around silhouettes that actually feel good to wear.', color: '#c7c0e5' },

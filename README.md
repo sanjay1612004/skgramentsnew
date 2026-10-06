@@ -26,7 +26,19 @@ The address and phone are supplied by the business owner: Door 17, Amarajyothi N
 
 Prices, measurements, GSM, fabric claims, stock, exact weekly hours, team, testimonials, and community figures are deliberately unset. Team/reviews/statistics sections are disabled. Enable them only with verified information. The About section uses the owner-supplied shop photos and confirmed facts: established in 2016, based in Tiruppur, and 200+ orders handled. Its milestone values and workshop copy are in `site.about`; no founder or additional business figures have been invented.
 
-Add prices and stock only when confirmed. Structured product offers are included only when prices exist; ratings are never fabricated. Canonical, Open Graph, social text, Organization, Product, and Breadcrumb data are included. Set `site.origin` when changing domains. A sitemap and robots file are generated during export. Internal page navigation uses native anchors and CSS page-entry transitions, so static hosting needs no framework request rewrites.
+Add prices and stock only when confirmed. Structured product offers are included only when prices exist; ratings are never fabricated. Canonical, Open Graph, social text, ClothingStore, WebSite, Service, Product, and Breadcrumb data are included. A sitemap and robots file are generated during export. Internal page navigation uses native anchors and CSS page-entry transitions, so static hosting needs no framework request rewrites.
+
+## Search visibility for bulk and wholesale orders
+
+The homepage and `/bulk-tshirt-orders/` describe bulk T-shirt orders, wholesale garment enquiries, and screen printing, embroidery and DTF printing in Tiruppur. The dedicated page contains ordering guidance, confirmed business facts and FAQs. Its content and all FAQ answers are included in the exported HTML. Navigation, footer, product and collection links lead buyers and crawlers to this page. Each route has its own canonical URL, title and description. No minimum quantity, price, turnaround time, delivery coverage or review rating is invented. FAQ content is provided for visitors; no Google FAQ rich-result eligibility is claimed.
+
+Before expecting search traffic:
+
+1. Make the production site publicly accessible. The existing Sites project was restricted to the owner when this SEO work started; `robots.txt` and metadata cannot bypass a login or an access restriction.
+2. Set `NEXT_PUBLIC_SITE_URL` to the actual production domain (see `.env.example`) before building. This controls canonical URLs, the sitemap and structured-data URLs. The current Sites domain remains the default.
+3. Verify the public site in Google Search Console. Use domain/DNS verification for a domain you own, or place the URL-prefix HTML verification token in `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` and rebuild. Then submit `/sitemap.xml` and inspect the homepage and `/bulk-tshirt-orders/`.
+4. Link the public website from the correct Google Business Profile and keep the business name, address and phone consistent. Add real customer reviews and confirmed order specifications when available.
+5. Use Search Console to monitor impressions, queries and indexing after publication. A technical SEO audit measures implementation, not Google position; rankings and search traffic are not guaranteed.
 
 ## Photography and concepts
 
