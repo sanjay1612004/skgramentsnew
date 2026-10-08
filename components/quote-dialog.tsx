@@ -136,7 +136,7 @@ export default function QuoteDialog({ details, close }: { details: QuoteDetails;
           ...(details.size ? { Size: details.size } : {}),
           'Request details': message,
           _replyto: email,
-          _subject: `New quote request | SK GARMENTS — ${subject}`,
+          _subject: `New quote request | THE SK APPARELS — ${subject}`,
           _template: 'table',
           _captcha: 'false',
           _honey: String(form.get('_honey') || ''),
@@ -162,11 +162,11 @@ export default function QuoteDialog({ details, close }: { details: QuoteDetails;
         const activation = result.failures.some(failure => failure.reason === 'activation');
         throw new Error(activation
           ? partial
-            ? 'Your request reached SK GARMENTS. An additional copy is awaiting confirmation from the shop. Please call us or try again later.'
-            : 'Quote delivery is awaiting confirmation from SK GARMENTS. Please try again shortly or call us.'
+            ? 'Your request reached THE SK APPARELS. An additional copy is awaiting confirmation from the shop. Please call us or try again later.'
+            : 'Quote delivery is awaiting confirmation from THE SK APPARELS. Please try again shortly or call us.'
           : partial
-            ? 'Your request reached SK GARMENTS, but an additional copy could not be submitted. Please retry to complete it or call us.'
-            : 'Your quote could not be sent. Please check your connection and try again or call SK GARMENTS.');
+            ? 'Your request reached THE SK APPARELS, but an additional copy could not be submitted. Please retry to complete it or call us.'
+            : 'Your quote could not be sent. Please check your connection and try again or call THE SK APPARELS.');
       }
       setReplyEmail(email);
       setStatus('success');
@@ -188,7 +188,7 @@ export default function QuoteDialog({ details, close }: { details: QuoteDetails;
       <div className="quote-card">
         <aside className="quote-brand" aria-hidden="true">
           <span className="quote-brand-orbit orbit-one" /><span className="quote-brand-orbit orbit-two" />
-          <div className="quote-brand-label">SK GARMENTS <span>TIRUPPUR</span></div>
+          <div className="quote-brand-label">THE SK APPARELS <span>TIRUPPUR</span></div>
           <span className="quote-brand-star">✳</span>
           <div className="quote-brand-copy"><span>MADE FOR YOUR NEXT IDEA.</span><p><span className="quote-brand-line"><span>Let’s make</span></span><span className="quote-brand-line"><span>something</span></span><span className="quote-brand-line"><span><em>worth wearing.</em></span></span></p></div>
           <div className="quote-brand-bottom"><span>GOOD FITS. GREAT POSSIBILITIES.</span><span>SK / 01</span></div>
@@ -230,7 +230,7 @@ export default function QuoteDialog({ details, close }: { details: QuoteDetails;
               <button type="button" className="quote-cancel" onClick={dismiss}>Cancel</button>
               <button type="submit" className="quote-submit" disabled={status === 'sending'}>{status === 'sending' ? <>Sending quote <LoaderCircle size={18} className="quote-spinner" /></> : <>Submit quote <ArrowUpRight size={19} /></>}</button>
             </div>
-            <p className="quote-delivery-note" data-quote-reveal><Mail size={13} /> Sent directly to SK GARMENTS. We’ll reply by email.</p>
+            <p className="quote-delivery-note" data-quote-reveal><Mail size={13} /> Sent directly to THE SK APPARELS. We’ll reply by email.</p>
           </form>}
         </div>
       </div>

@@ -1,4 +1,4 @@
-# SK GARMENTS
+# THE SK APPARELS
 
 An editorial, interactive fashion website built with Next.js App Router, TypeScript, Tailwind CSS, Framer Motion, and Lucide. Content routes export as static files. No database, authentication, API routes, server actions, or payment processing are used.
 
@@ -24,7 +24,7 @@ Success is shown only after both endpoints accept the request; this confirms ser
 
 Quote submissions include email, an optional phone number, the request subject, selected product/color/size when available, and the message. The owner email uses FormSubmit's table template with clear field labels and a “New quote request” subject. The explicit source URL field is omitted, and Reply-To remains the customer's email address.
 
-A custom SK GARMENTS email design and Gmail sender are prepared in `services/quote-mailer/`. It uses the shop’s forest-green and cream palette, customer contact cards, a message panel, reply/call actions, and India-time submission details. Follow [the sender setup](services/quote-mailer/README.md) to configure a Gmail App Password and enable `NEXT_PUBLIC_QUOTE_API_URL`. Until enabled, quote delivery continues through the existing FormSubmit flow. `npm run email:preview` generates a standalone sample; `npm run email:test` checks delivery and retry behavior without sending emails.
+A custom THE SK APPARELS email design and Gmail sender are prepared in `services/quote-mailer/`. It uses the shop’s forest-green and cream palette, customer contact cards, a message panel, reply/call actions, and India-time submission details. Follow [the sender setup](services/quote-mailer/README.md) to configure a Gmail App Password and enable `NEXT_PUBLIC_QUOTE_API_URL`. Until enabled, quote delivery continues through the existing FormSubmit flow. `npm run email:preview` generates a standalone sample; `npm run email:test` checks delivery and retry behavior without sending emails.
 
 The address and phone are supplied by the business owner: Door 17, Amarajyothi Nagar, Samundipuram, Tiruppur, Tamil Nadu 641603; the current configured phone and WhatsApp number is +91 93448 56330. The location section and map directions are enabled. The shared listing status does not establish a full weekly schedule, so visitors are asked to call for current opening hours. WhatsApp is not assumed from a phone number.
 
@@ -36,11 +36,15 @@ Add prices and stock only when confirmed. Structured product offers are included
 
 The homepage and `/bulk-tshirt-orders/` describe bulk T-shirt orders, wholesale garment enquiries, and screen printing, embroidery and DTF printing in Tiruppur. The dedicated page contains ordering guidance, confirmed business facts and FAQs. Its content and all FAQ answers are included in the exported HTML. Navigation, footer, product and collection links lead buyers and crawlers to this page. Each route has its own canonical URL, title and description. No minimum quantity, price, turnaround time, delivery coverage or review rating is invented. FAQ content is provided for visitors; no Google FAQ rich-result eligibility is claimed.
 
+The homepage leads its title with THE SK APPARELS and includes the brand in its visible H1 and introduction. Its single WebSite structured-data node lists The SK Apparel, theskapparel and theskapparel.com as alternate names; the homepage WebPage and ClothingStore nodes share stable IDs. Canonical and sitemap URLs use the www custom domain. Vercel project domain settings permanently redirect the apex and both former Vercel addresses directly to the preferred host, preserving paths and query strings. Domain redirects are managed in Vercel, separately from the verification-file rewrite in `vercel.json`.
+
 Before expecting search traffic:
 
-1. Make the production site publicly accessible. The existing Sites project was restricted to the owner when this SEO work started; `robots.txt` and metadata cannot bypass a login or an access restriction.
-2. Set `NEXT_PUBLIC_SITE_URL` to the actual production domain (see `.env.example`) before building. This controls canonical URLs, the sitemap and structured-data URLs. The current Sites domain remains the default.
-3. Verify the public site in Google Search Console. Use domain/DNS verification for a domain you own, or place the URL-prefix HTML verification token in `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` and rebuild. Then submit `/sitemap.xml` and inspect the homepage and `/bulk-tshirt-orders/`.
+The sitemap is generated at `/sitemap.xml`. `/sitemaps.xml` is a Vercel rewrite to the same XML, so both addresses always contain the same current page URLs. Submit either address once in Search Console; `robots.txt` points to `/sitemap.xml`.
+
+1. Keep the production site publicly accessible at `https://www.theskapparel.com`. The `theskapparel.com` address redirects to `www.theskapparel.com`.
+2. Set `NEXT_PUBLIC_SITE_URL` to the actual production domain (see `.env.example`) before building. This controls canonical URLs, the sitemap and structured-data URLs. The default is `https://www.theskapparel.com`.
+3. Verify `https://www.theskapparel.com/` as a URL-prefix property in Google Search Console. The HTML verification file is available at `/google2ca0e60b091969f5.html`; `vercel.json` preserves that exact path. Alternatively, set the HTML meta verification token in `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` and rebuild. Then submit `/sitemap.xml` and inspect the homepage and `/bulk-tshirt-orders/`.
 4. Link the public website from the correct Google Business Profile and keep the business name, address and phone consistent. Add real customer reviews and confirmed order specifications when available.
 5. Use Search Console to monitor impressions, queries and indexing after publication. A technical SEO audit measures implementation, not Google position; rankings and search traffic are not guaranteed.
 

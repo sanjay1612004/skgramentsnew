@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/sitemaps.xml",
+      "destination": "/sitemap.xml"
+    },
+    {
+      "source": "/google2ca0e60b091969f5.html",
+      "destination": "/google2ca0e60b091969f5/"
+    }
+  ]
+}

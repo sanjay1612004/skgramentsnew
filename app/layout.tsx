@@ -8,7 +8,7 @@ import { businessStructuredData, homeTitle, jsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.origin),
-  title: { default: homeTitle, template: '%s | SK GARMENTS' },
+  title: { default: homeTitle, template: `%s | ${site.name}` },
   description: site.description,
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
   verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined },

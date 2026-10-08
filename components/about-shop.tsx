@@ -10,8 +10,8 @@ import './about-shop.css';
 
 const ease = [.22, 1, .36, 1] as const;
 const photos = [
-  { src: '/images/shop/shop1.webp', alt: 'Inside the SK GARMENTS shop, with sewing machines and garment workstations', caption: 'ON THE SHOP FLOOR', width: 383, height: 510 },
-  { src: '/images/shop/shop2.webp', alt: 'Another view of the SK GARMENTS workshop, showing worktables, machines and fabric storage', caption: 'WHERE IDEAS TAKE SHAPE', width: 382, height: 510 },
+  { src: '/images/shop/shop1.webp', alt: 'Inside the THE SK APPARELS shop, with sewing machines and garment workstations', caption: 'ON THE SHOP FLOOR', width: 383, height: 510 },
+  { src: '/images/shop/shop2.webp', alt: 'Another view of the THE SK APPARELS workshop, showing worktables, machines and fabric storage', caption: 'WHERE IDEAS TAKE SHAPE', width: 382, height: 510 },
 ] as const;
 
 function ShopPhoto({ index, progress }: { index: number; progress: MotionValue<number> }) {
@@ -37,7 +37,7 @@ export default function AboutShop({ children }: { children?: ReactNode }) {
 
   return (
     <section ref={root} className="about-shop" id="about" aria-labelledby="about-shop-heading">
-      <div className="about-shop-kicker"><span>08 / OUR STORY</span><span>SK GARMENTS · TIRUPPUR</span></div>
+      <div className="about-shop-kicker"><span>08 / OUR STORY</span><span>THE SK APPARELS · TIRUPPUR</span></div>
       <div className="about-shop-layout">
         <div className="about-shop-copy">
           <motion.p className="about-shop-eyebrow" initial={reveal} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: .6, ease }}><span aria-hidden="true" /> MADE HERE. SINCE {site.about.establishedYear}.</motion.p>

@@ -4,10 +4,10 @@ export type BrandedQuoteRequest = { requestId: string; email: string; phone: str
 
 export async function sendBrandedQuote(endpoint: string, payload: BrandedQuoteRequest, signal: AbortSignal) {
   const url = new URL(endpoint, window.location.origin);
-  if (url.protocol !== 'https:' && !(url.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname))) throw new Error('Quote email setup needs a secure connection. Please call SK GARMENTS.');
+  if (url.protocol !== 'https:' && !(url.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname))) throw new Error('Quote email setup needs a secure connection. Please call THE SK APPARELS.');
   const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, signal, body: JSON.stringify(payload) });
   const result = await response.json();
-  if (!response.ok || result.success !== true) throw new Error(result.message || 'Your quote could not be sent. Please try again or call SK GARMENTS.');
+  if (!response.ok || result.success !== true) throw new Error(result.message || 'Your quote could not be sent. Please try again or call THE SK APPARELS.');
 }
 
 export async function sendQuoteCopies(recipients: string[], payload: Record<string, string>, signal: AbortSignal) {

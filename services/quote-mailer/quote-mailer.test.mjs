@@ -30,13 +30,13 @@ test('email escapes customer content, preserves line breaks, and omits source an
 test('SMTP message contains both recipients, customer Reply-To and HTML/plain-text alternatives', async () => {
   const transport = nodemailer.createTransport({ streamTransport: true, buffer: true });
   const email = renderQuoteEmail(sampleQuote);
-  const info = await transport.sendMail({ from: { name: 'SK GARMENTS', address: 'owner@example.com' }, to: inboxes, replyTo: sampleQuote.email, subject: 'SK GARMENTS quote', ...email });
+  const info = await transport.sendMail({ from: { name: 'THE SK APPARELS', address: 'owner@example.com' }, to: inboxes, replyTo: sampleQuote.email, subject: 'THE SK APPARELS quote', ...email });
   assert.deepEqual(info.envelope.to, inboxes);
   const mime = info.message.toString();
   assert.match(mime, /Reply-To: customer@example.com/);
   assert.match(mime, /Content-Type: text\/plain/);
   assert.match(mime, /Content-Type: text\/html/);
-  assert.match(mime, /From: SK GARMENTS <owner@example.com>/);
+  assert.match(mime, /From: THE SK APPARELS <owner@example.com>/);
 });
 
 test('one branded email targets both fixed inboxes with customer Reply-To; identical retry does not resend', async () => {
@@ -47,7 +47,7 @@ test('one branded email targets both fixed inboxes with customer Reply-To; ident
     assert.equal((await submit(data)).status, 200);
     assert.equal(sent.length, 1);
     assert.deepEqual(sent[0].to, inboxes);
-    assert.equal(sent[0].from.name, 'SK GARMENTS');
+    assert.equal(sent[0].from.name, 'THE SK APPARELS');
     assert.equal(sent[0].replyTo, sampleQuote.email);
     assert.ok(sent[0].html.includes('Reply to customer') && sent[0].text.includes(sampleQuote.message));
     assert.equal((await submit({ ...data, message: 'Changed request' })).status, 409);

@@ -1,6 +1,6 @@
-# SK GARMENTS branded quote email
+# THE SK APPARELS branded quote email
 
-This Node service sends the custom HTML and plain-text email through Gmail SMTP to **both** `s.kishorebabu8@gmail.com` and `shivajiksgarments@gmail.com`. The sender displays as **SK GARMENTS**, and Reply-To points to the customer. The email includes a reference, an India-time timestamp, contact details, the message, selected garment details when supplied, and reply/call actions. It does not include a source URL or FormSubmit branding.
+This Node service sends the custom HTML and plain-text email through Gmail SMTP to **both** `s.kishorebabu8@gmail.com` and `shivajiksgarments@gmail.com`. The sender displays as **THE SK APPARELS**, and Reply-To points to the customer. The email includes a reference, an India-time timestamp, contact details, the message, selected garment details when supplied, and reply/call actions. It does not include a source URL or FormSubmit branding.
 
 ## Enable locally
 

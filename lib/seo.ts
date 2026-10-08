@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { site } from '@/data/site';
 
-export const homeTitle = 'Bulk T-Shirt Orders & Wholesale in Tiruppur | SK GARMENTS';
+export const homeTitle = `${site.name} | Bulk T-Shirts & Wholesale in Tiruppur`;
 
 export function pageMetadata(title: string, description: string, path: string): Metadata {
   return {
@@ -19,12 +19,33 @@ export function jsonLd(value: unknown) {
 export const businessId = `${site.origin}/#business`;
 export const websiteId = `${site.origin}/#website`;
 
+export function homeStructuredData() {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite', '@id': websiteId,
+        name: site.name, alternateName: site.alternateNames,
+        url: `${site.origin}/`, inLanguage: 'en-IN',
+        publisher: { '@id': businessId },
+      },
+      {
+        '@type': 'WebPage', '@id': `${site.origin}/#page`,
+        name: homeTitle, description: site.description, url: `${site.origin}/`,
+        inLanguage: 'en-IN', isPartOf: { '@id': websiteId },
+        about: { '@id': businessId }, mainEntity: { '@id': businessId },
+      },
+    ],
+  };
+}
+
 export function businessStructuredData() {
   const digits = site.contact.phone.replace(/\D/g, '');
   return {
     '@context': 'https://schema.org',
     '@type': 'ClothingStore', '@id': businessId,
-    name: site.name, url: `${site.origin}/`, description: site.description,
+    name: site.name, alternateName: site.alternateNames,
+    url: `${site.origin}/`, description: site.description,
     foundingDate: String(site.about.establishedYear),
     telephone: digits.length === 10 ? `+91${digits}` : `+${digits}`,
     email: site.contact.email,

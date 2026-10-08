@@ -33,7 +33,7 @@
 
 .hero-sticker{z-index:6}.campaign-image{background-size:cover;background-position:center 30%}.campaign-0{background-image:url(/images/campaign-1.webp)}.campaign-1{background-image:url(/images/campaign-2.webp)}.campaign-2{background-image:url(/images/campaign-3.webp)}.campaign-3{background-image:url(/images/campaign-4.webp)}.campaign-4{background-image:url(/images/campaign-5.webp)}
 
-.logo span{max-width:none}
+.logo{flex-direction:column;align-items:flex-start;gap:3px;font-size:1.9rem;letter-spacing:-.08em;white-space:nowrap}.logo span{max-width:none;font-size:.65rem;letter-spacing:.23em}
 
 .principles-reduced{padding:0;background:var(--lavender)}.principles-reduced>.section-kicker{padding:40px 5vw;margin:0}.principles-reduced article{padding:55px 5vw;display:flex;align-items:center;justify-content:space-between;gap:30px}.principles-reduced h2{font-size:10vw}.principles-reduced p{max-width:330px;font-size:1.125rem}@media(max-width:760px){.principles-reduced>.section-kicker{padding:35px 6vw}.principles-reduced article{padding:40px 6vw;display:block}.principles-reduced h2{font-size:17vw;margin-bottom:25px}.principles-reduced p{font-size:1rem}}
 
@@ -168,3 +168,5 @@ body:has(.quote-modal[open]){overflow:hidden}
 
 /* Keep a real hoodie preview visible while the smaller interactive model warms up. */
 .graphic-model{contain:layout paint}.graphic-model-poster{position:absolute;inset:0;pointer-events:none;transition:opacity .3s,visibility .3s}.graphic-model-poster img{object-fit:contain}.graphic-model .graphic-model-viewer{opacity:0;transition:opacity .3s}.graphic-model[data-status="ready"] .graphic-model-poster{opacity:0;visibility:hidden}.graphic-model[data-status="ready"] .graphic-model-viewer{opacity:1}.graphic-model .graphic-model-status{inset:auto 12px 12px;padding:8px 12px;font-size:.8125rem;min-height:36px}.graphic-model-status button{pointer-events:auto;text-decoration:underline;text-underline-offset:3px;padding:6px}.graphic-model[data-status="error"] .graphic-model-status{background:var(--lavender)}@media(prefers-reduced-motion:reduce){.graphic-model-poster,.graphic-model .graphic-model-viewer{transition:none}}
+
+.hero-title .hero-brand{display:block;margin:0 0 18px;font-family:var(--body);font-size:clamp(.75rem,1vw,.875rem);font-weight:600;line-height:1.4;letter-spacing:.12em}

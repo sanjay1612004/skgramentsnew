@@ -44,7 +44,7 @@ export function createQuoteServer({ env = process.env, transport } = {}) {
     if (url.pathname !== '/api/quote') { response.writeHead(404); response.end(); return; }
     const origin = request.headers.origin;
     const json = (status, body) => { response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); response.end(JSON.stringify(body)); };
-    if (typeof origin !== 'string' || !origins.has(origin)) { json(403, { success: false, message: 'Please submit your quote from the SK GARMENTS website.' }); return; }
+    if (typeof origin !== 'string' || !origins.has(origin)) { json(403, { success: false, message: 'Please submit your quote from the THE SK APPARELS website.' }); return; }
     response.setHeader('Access-Control-Allow-Origin', origin);
     response.setHeader('Vary', 'Origin');
     if (request.method === 'OPTIONS') {
@@ -75,7 +75,7 @@ export function createQuoteServer({ env = process.env, transport } = {}) {
       return;
     }
     if (quote.honey) { json(200, { success: true }); return; }
-    if (!mailer) { json(503, { success: false, message: 'Quote email setup is not ready yet. Please call SK GARMENTS.' }); return; }
+    if (!mailer) { json(503, { success: false, message: 'Quote email setup is not ready yet. Please call THE SK APPARELS.' }); return; }
     for (const [key, record] of records) if (!record.inFlight && record.createdAt.getTime() + 86400000 < now) records.delete(key);
     const fingerprint = createHash('sha256').update(JSON.stringify(quote)).digest('hex');
     let record = records.get(quote.requestId);
@@ -90,8 +90,8 @@ export function createQuoteServer({ env = process.env, transport } = {}) {
       const pending = inboxes.filter(inbox => !record.accepted.has(inbox));
       const email = renderQuoteEmail(quote, { receivedAt: record.createdAt, reference });
       record.inFlight = Promise.resolve().then(() => mailer.sendMail({
-        from: { name: 'SK GARMENTS', address: sender }, to: pending, replyTo: quote.email,
-        subject: `New quote · SK GARMENTS | ${quote.subject}`, html: email.html, text: email.text,
+        from: { name: 'THE SK APPARELS', address: sender }, to: pending, replyTo: quote.email,
+        subject: `New quote · THE SK APPARELS | ${quote.subject}`, html: email.html, text: email.text,
         disableFileAccess: true, disableUrlAccess: true,
       })).then(info => {
         for (const accepted of info.accepted || []) if (inboxes.includes(String(accepted).toLowerCase())) record.accepted.add(String(accepted).toLowerCase());
@@ -101,7 +101,7 @@ export function createQuoteServer({ env = process.env, transport } = {}) {
     }
     await record.inFlight;
     if (record.accepted.size !== inboxes.length) {
-      json(502, { success: false, message: record.accepted.size ? 'Your quote reached SK GARMENTS, but one copy could not be sent. Please retry to complete it.' : 'Your quote could not be sent. Please try again or call SK GARMENTS.' });
+      json(502, { success: false, message: record.accepted.size ? 'Your quote reached THE SK APPARELS, but one copy could not be sent. Please retry to complete it.' : 'Your quote could not be sent. Please try again or call THE SK APPARELS.' });
       return;
     }
     json(200, { success: true, reference });

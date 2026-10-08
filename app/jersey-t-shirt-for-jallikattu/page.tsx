@@ -8,7 +8,7 @@ import './jallikattu.css';
 
 const path = '/jersey-t-shirt-for-jallikattu/';
 const title = 'Jallikattu Jersey T-Shirts & Bull Print Designs';
-const description = 'Explore Jallikattu jersey T-shirts with bold Tamil bull artwork. Discover custom team names, colours and print ideas from SK GARMENTS in Tiruppur, Tamil Nadu.';
+const description = 'Explore Jallikattu jersey T-shirts with bold Tamil bull artwork. Discover custom team names, colours and print ideas from THE SK APPARELS in Tiruppur, Tamil Nadu.';
 const imageRoot = '/images/jallikattu';
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: `${title} | ${site.name}`, description, url: path,
     type: 'website', siteName: site.name, locale: 'en_IN',
-    images: [{ url: `${imageRoot}/jallikattu-jersey-social.webp`, width: 1200, height: 630, alt: 'Black Jallikattu jersey with gold Tamil bull artwork by SK GARMENTS' }],
+    images: [{ url: `${imageRoot}/jallikattu-jersey-social.webp`, width: 1200, height: 630, alt: 'Black Jallikattu jersey with gold Tamil bull artwork by THE SK APPARELS' }],
   },
   twitter: {
     card: 'summary_large_image', title, description,
@@ -34,7 +34,7 @@ const faqs = [
   { question: 'What is a Jallikattu jersey T-shirt?', answer: 'A Jallikattu jersey T-shirt is a sportswear-inspired garment featuring artwork connected to Jallikattu, often a native Tamil bull, Tamil lettering or a team identity. This collection explores those ideas through contemporary jersey designs.' },
   { question: 'Can a Jallikattu bull image be printed on a jersey?', answer: 'Bull artwork can be discussed as part of a custom jersey design. The size, colours, placement and printing method depend on the chosen garment and the detail in your image. Final artwork is confirmed before production.' },
   { question: 'Can the design include Tamil text, team names and numbers?', answer: 'Customisation can include your preferred Tamil or English lettering, a team or village name, and individual names or numbers. Spelling, type style and placement are reviewed with the artwork so the design feels consistent across the team.' },
-  { question: 'Does SK GARMENTS handle bulk Jallikattu jersey enquiries?', answer: 'SK GARMENTS in Tiruppur handles bulk garment and custom-print enquiries. Quantity, size breakdown, fabric, artwork and your required date help define a Jallikattu team order. Minimum quantities, prices and delivery arrangements are confirmed for each enquiry.' },
+  { question: 'Does THE SK APPARELS handle bulk Jallikattu jersey enquiries?', answer: 'THE SK APPARELS in Tiruppur handles bulk garment and custom-print enquiries. Quantity, size breakdown, fabric, artwork and your required date help define a Jallikattu team order. Minimum quantities, prices and delivery arrangements are confirmed for each enquiry.' },
 ];
 
 export default function JallikattuPage() {
@@ -53,7 +53,7 @@ export default function JallikattuPage() {
         '@type': 'ImageObject', '@id': `${url}#hero-image`,
         contentUrl: `${site.origin}${imageRoot}/jallikattu-black-bull-jersey.webp`,
         name: 'Jallikattu bull artwork jersey design',
-        caption: 'Jallikattu jersey design concept in charcoal and antique gold by SK GARMENTS.',
+        caption: 'Jallikattu jersey design concept in charcoal and antique gold by THE SK APPARELS.',
         representativeOfPage: true,
       },
       {
@@ -108,7 +108,7 @@ export default function JallikattuPage() {
 
       <section id="details" className="jk-details jk-section" aria-labelledby="jk-details-title">
         <div className="jk-section-label"><span>03 / MAKE IT YOURS</span><span>YOUR TEAM. YOUR IDENTITY.</span></div>
-        <div className="jk-details-grid"><div><p className="jk-eyebrow">CUSTOM JALLIKATTU JERSEY DESIGNS</p><h2 id="jk-details-title">Every detail.<br /><em>A little more you.</em></h2><p className="jk-details-intro">From a single idea to a coordinated team look, the details make a Jallikattu T-shirt feel like it belongs to you.</p><p className="jk-details-footnote">Custom garment and printing enquiries from SK GARMENTS, Tiruppur. Fabric, fit and finish are selected around the requirements of your order.</p></div><dl><div><dt><span>01</span>Bull artwork</dt><dd>A statement bull graphic, a restrained emblem or your own original Jallikattu illustration. Placement makes the difference.</dd></div><div><dt><span>02</span>Tamil lettering</dt><dd>A village name, a meaningful phrase or your team identity, thoughtfully placed alongside the artwork.</dd></div><div><dt><span>03</span>Team colours & numbers</dt><dd>A palette that brings your group together, with individual names and numbers for a personal finish.</dd></div><div><dt><span>04</span>Your choice of silhouette</dt><dd>Discuss jersey and T-shirt options, preferred sleeves, necklines and a size breakdown that works for your team.</dd></div></dl></div>
+        <div className="jk-details-grid"><div><p className="jk-eyebrow">CUSTOM JALLIKATTU JERSEY DESIGNS</p><h2 id="jk-details-title">Every detail.<br /><em>A little more you.</em></h2><p className="jk-details-intro">From a single idea to a coordinated team look, the details make a Jallikattu T-shirt feel like it belongs to you.</p><p className="jk-details-footnote">Custom garment and printing enquiries from THE SK APPARELS, Tiruppur. Fabric, fit and finish are selected around the requirements of your order.</p></div><dl><div><dt><span>01</span>Bull artwork</dt><dd>A statement bull graphic, a restrained emblem or your own original Jallikattu illustration. Placement makes the difference.</dd></div><div><dt><span>02</span>Tamil lettering</dt><dd>A village name, a meaningful phrase or your team identity, thoughtfully placed alongside the artwork.</dd></div><div><dt><span>03</span>Team colours & numbers</dt><dd>A palette that brings your group together, with individual names and numbers for a personal finish.</dd></div><div><dt><span>04</span>Your choice of silhouette</dt><dd>Discuss jersey and T-shirt options, preferred sleeves, necklines and a size breakdown that works for your team.</dd></div></dl></div>
       </section>
 
       <section className="jk-manifesto" aria-label="The Jallikattu collection spirit"><p className="jk-eyebrow">ROOTED HERE. WORN EVERYWHERE.</p><p className="jk-manifesto-title">More than a jersey.<br /><em>A sense of belonging.</em></p><span lang="ta">நம் மண். நம் அடையாளம்.</span></section>

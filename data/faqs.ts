@@ -6,6 +6,6 @@ export const faqs = [
  { question: 'How do I choose my fit?', answer: 'Regular sits closer to the body; relaxed adds ease; oversized gives more room and dropped shoulders; boxy is wider and shorter. Compare the product-specific measurements with a tee you already love.' },
  { question: 'What fabric do you use?', answer: 'Fabric composition and weight vary by product. Final fabric specifications will be added to each product page once confirmed.' },
  { question: 'How should I wash my T-shirt?', answer: 'Follow the care label on your garment. Ask for the product-specific care instructions, especially for printed pieces, before ordering.' },
- { question: 'How do shipping, payment, and exchanges work?', answer: 'Options depend on your location and ordering method. SK GARMENTS will confirm shipping costs, delivery estimates, payment options, and exchange terms before an order is placed.' },
- { question: 'Does requesting a quote place an order?', answer: 'No. A quote request starts an enquiry. An order is confirmed only after availability, final prices, and payment arrangements are agreed directly with SK GARMENTS.' }
+ { question: 'How do shipping, payment, and exchanges work?', answer: 'Options depend on your location and ordering method. THE SK APPARELS will confirm shipping costs, delivery estimates, payment options, and exchange terms before an order is placed.' },
+ { question: 'Does requesting a quote place an order?', answer: 'No. A quote request starts an enquiry. An order is confirmed only after availability, final prices, and payment arrangements are agreed directly with THE SK APPARELS.' }
 ];

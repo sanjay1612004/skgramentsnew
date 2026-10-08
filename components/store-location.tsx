@@ -9,7 +9,7 @@ export default function StoreLocation() {
   return (
     <section className="store" id="location" aria-labelledby="store-heading">
       <div className="store-details">
-        <p className="store-eyebrow"><span /> SK GARMENTS / TIRUPPUR</p>
+        <p className="store-eyebrow"><span /> THE SK APPARELS / TIRUPPUR</p>
         <h3 id="store-heading">COME<br /><em>SAY HI.</em></h3>
         <p className="store-intro">A little style. A proper conversation.<br />Find your next favorite, right here.</p>
 
@@ -38,12 +38,12 @@ export default function StoreLocation() {
           <p>A little closer to your next favourite.</p>
         </div>
         <div className="store-map-frame">
-          <iframe src={mapEmbedUrl} title="Google Map showing the SK GARMENTS shop address in Tiruppur" loading="lazy" allowFullScreen referrerPolicy="no-referrer-when-downgrade" />
+          <iframe src={mapEmbedUrl} title="Google Map showing the THE SK APPARELS shop address in Tiruppur" loading="lazy" allowFullScreen referrerPolicy="no-referrer-when-downgrade" />
         </div>
         <div className="store-map-footer">
           <div className="store-map-pin"><MapPin size={20} strokeWidth={1.5} aria-hidden="true" /></div>
-          <div><strong>SK GARMENTS</strong><span>Amarajyothi Nagar · Samundipuram</span></div>
-          {site.contact.mapsUrl && <a href={site.contact.mapsUrl} target="_blank" rel="noopener noreferrer" aria-label="Open the SK GARMENTS shop address in Google Maps"><span>Open in Google Maps</span><ArrowUpRight size={20} aria-hidden="true" /></a>}
+          <div><strong>THE SK APPARELS</strong><span>Amarajyothi Nagar · Samundipuram</span></div>
+          {site.contact.mapsUrl && <a href={site.contact.mapsUrl} target="_blank" rel="noopener noreferrer" aria-label="Open the THE SK APPARELS shop address in Google Maps"><span>Open in Google Maps</span><ArrowUpRight size={20} aria-hidden="true" /></a>}
         </div>
       </div>
     </section>
