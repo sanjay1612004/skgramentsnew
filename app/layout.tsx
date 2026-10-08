@@ -18,5 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="en-IN"><body><ModalProvider><Navigation />{children}<Footer /></ModalProvider><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(businessStructuredData()) }} /></body></html>;
+  return <html lang="en-IN"><head><link rel="alternate" type="application/atom+xml" title={site.name} href={`${site.origin}/atom.xml`} /></head><body><ModalProvider><Navigation />{children}<Footer /></ModalProvider><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(businessStructuredData()) }} /></body></html>;
 }

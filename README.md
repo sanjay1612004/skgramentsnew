@@ -1,6 +1,6 @@
 # THE SK APPARELS
 
-An editorial, interactive fashion website built with Next.js App Router, TypeScript, Tailwind CSS, Framer Motion, and Lucide. Content routes export as static files. No database, authentication, API routes, server actions, or payment processing are used.
+An editorial, interactive fashion website built with Next.js App Router, TypeScript, Tailwind CSS, Framer Motion, and Lucide. Content routes and the Atom feed route export as static files. No database, authentication, runtime API routes, server actions, or payment processing are used.
 
 ## Run and export
 
@@ -41,6 +41,8 @@ The homepage leads its title with THE SK APPARELS and includes the brand in its 
 Before expecting search traffic:
 
 The sitemap is generated at `/sitemap.xml`. `/sitemaps.xml` is a Vercel rewrite to the same XML, so both addresses always contain the same current page URLs. Submit either address once in Search Console; `robots.txt` points to `/sitemap.xml`.
+
+An Atom 1.0 feed is exported at `/atom.xml`, with the same public URLs as the sitemap and titles and summaries from the site data. The HTML head advertises the feed. Google accepts this format as an additional sitemap submission, but it does not fix a fetch error or guarantee indexing. The `updated` timestamp in `app/atom.xml/route.ts` records initial feed publication; advance it when the included content changes, not for deployments that leave the content unchanged.
 
 1. Keep the production site publicly accessible at `https://www.theskapparel.com`. The `theskapparel.com` address redirects to `www.theskapparel.com`.
 2. Set `NEXT_PUBLIC_SITE_URL` to the actual production domain (see `.env.example`) before building. This controls canonical URLs, the sitemap and structured-data URLs. The default is `https://www.theskapparel.com`.
