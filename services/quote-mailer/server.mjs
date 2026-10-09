@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import nodemailer from 'nodemailer';
 import { renderQuoteEmail, sampleQuote } from './template.mjs';
+import { internationalPhone, validateQuoteFields } from '../../lib/quote-validation.mjs';
 
 const inboxes = ['s.kishorebabu8@gmail.com', 'shivajiksgarments@gmail.com'];
 const emailPattern = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
@@ -16,10 +17,11 @@ function readQuote(value) {
     if ((required && !result) || result.length > max || (!multiline && /[\r\n]/.test(result)) || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(result)) throw new Error('Please check your quote details.');
     return result;
   };
-  const quote = { requestId: field('requestId', 36, true), email: field('email', 254, true), phone: field('phone', 30), subject: field('subject', 160, true), message: field('message', 2000, true, true), product: field('product', 160), color: field('color', 60), size: field('size', 30), honey: field('honey', 200) };
+  const quote = { requestId: field('requestId', 36, true), email: field('email', 254, true), phone: field('phone', 30, true), country: field('country', 2) || 'IN', subject: field('subject', 160, true), message: field('message', 2000, true, true), product: field('product', 160), color: field('color', 60), size: field('size', 30), honey: field('honey', 200) };
   if (!uuidPattern.test(quote.requestId) || !emailPattern.test(quote.email)) throw new Error('Please enter a valid email and quote details.');
-  const digits = quote.phone.replace(/\D/g, '');
-  if (quote.phone && (!/^\+?[\d\s().-]+$/.test(quote.phone) || digits.length < 7 || digits.length > 15)) throw new Error('Please enter a valid phone number.');
+  const errors = validateQuoteFields(quote);
+  if (Object.keys(errors).length) throw new Error(Object.values(errors)[0]);
+  quote.phone = internationalPhone(quote.phone, quote.country);
   return quote;
 }
 

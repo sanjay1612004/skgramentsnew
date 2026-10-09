@@ -1,6 +1,6 @@
 export type QuoteDeliveryFailure = { recipient: string; reason: 'activation' | 'network' | 'rejected' };
 
-export type BrandedQuoteRequest = { requestId: string; email: string; phone: string; subject: string; message: string; product?: string; color?: string; size?: string; honey: string };
+export type BrandedQuoteRequest = { requestId: string; email: string; phone: string; country: string; subject: string; message: string; product?: string; color?: string; size?: string; honey: string };
 
 export async function sendBrandedQuote(endpoint: string, payload: BrandedQuoteRequest, signal: AbortSignal) {
   const url = new URL(endpoint, window.location.origin);

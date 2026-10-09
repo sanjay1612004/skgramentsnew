@@ -4,9 +4,29 @@ import { randomUUID } from 'node:crypto';
 import nodemailer from 'nodemailer';
 import { createQuoteServer } from './server.mjs';
 import { renderQuoteEmail, sampleQuote } from './template.mjs';
+import { internationalPhone, validateQuoteFields } from '../../lib/quote-validation.mjs';
 
 const inboxes = ['s.kishorebabu8@gmail.com', 'shivajiksgarments@gmail.com'];
 const quote = () => ({ ...sampleQuote, requestId: randomUUID(), honey: '' });
+
+test('shared validation requires every visible field and accepts international and Unicode quote details', () => {
+  assert.deepEqual(Object.keys(validateQuoteFields({ email: '', phone: '', country: '', subject: '', message: '' })).sort(), ['country', 'email', 'message', 'phone', 'subject']);
+  const valid = { ...sampleQuote, country: 'IN' };
+  assert.deepEqual(validateQuoteFields(valid), {});
+  assert.deepEqual(validateQuoteFields({ ...valid, subject: 'தமிழ் ஆடைகள்', message: '100 ஆடைகள் தேவை. Please share pricing!\nSizes: S–XL.' }), {});
+  for (const email of ['a..b@example.com', 'a.@example.com', 'a@-example.com', 'a@example', 'a b@example.com']) assert.ok(validateQuoteFields({ ...valid, email }).email, email);
+  for (const phone of ['', '1234567890', '9999999999', '98765abc43210', '987654321', '+1 9876543210']) assert.ok(validateQuoteFields({ ...valid, phone }).phone, phone);
+  for (const [country, phone, expected] of [['IN', '98765 43210', '+919876543210'], ['IN', '+91 (98765) 43210', '+919876543210'], ['US', '415-555-2671', '+14155552671'], ['GB', '7700 900123', '+447700900123'], ['SG', '8123 4567', '+6581234567']]) {
+    assert.deepEqual(validateQuoteFields({ ...valid, country, phone }), {});
+    assert.equal(internationalPhone(phone, country), expected);
+  }
+  assert.ok(validateQuoteFields({ ...valid, subject: '  ' }).subject);
+  assert.ok(validateQuoteFields({ ...valid, subject: '!!' }).subject);
+  assert.ok(validateQuoteFields({ ...valid, subject: 'Hello\nBcc: other@example.com' }).subject);
+  assert.ok(validateQuoteFields({ ...valid, message: 'Too short' }).message);
+  assert.ok(validateQuoteFields({ ...valid, message: '!!!!!!!!!!!!' }).message);
+  assert.ok(validateQuoteFields({ ...valid, message: 'Hello\u0000there' }).message);
+});
 async function withServer(transport, work) {
   const server = createQuoteServer({ env: { SMTP_USER: 'owner@example.com', ALLOWED_ORIGINS: 'http://localhost:3000', NODE_ENV: 'production' }, transport });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
@@ -86,5 +106,18 @@ test('missing credentials cannot report success, and repeated requests are limit
     assert.equal((await result.json()).success, false);
     for (let i = 0; i < 5; i++) await submit(quote());
     assert.equal((await submit(quote())).status, 429);
+  });
+});
+
+test('required phone, country-specific numbers, and meaningful quote details are enforced before sending', async () => {
+  const sent = [];
+  await withServer({ sendMail: async mail => { sent.push(mail); return { accepted: inboxes }; } }, async submit => {
+    for (const invalid of [{ phone: '' }, { phone: '1234567890' }, { country: 'XX' }, { message: 'Too short' }, { subject: '!!!' }]) {
+      assert.equal((await submit({ ...quote(), ...invalid })).status, 400);
+    }
+    assert.equal(sent.length, 0);
+    assert.equal((await submit({ ...quote(), country: 'US', phone: '(415) 555-2671' })).status, 200);
+    assert.equal(sent.length, 1);
+    assert.ok(sent[0].text.includes('+14155552671'));
   });
 });

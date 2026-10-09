@@ -1,18 +1,21 @@
 'use client';
 
 import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { ArrowUpRight, Check, LoaderCircle, Mail, X } from 'lucide-react';
+import { ArrowUpRight, Check, CircleAlert, LoaderCircle, Mail, X } from 'lucide-react';
 import { gsap } from 'gsap';
 import { site } from '@/data/site';
 import { sendBrandedQuote, sendQuoteCopies } from '@/lib/quote-delivery';
+import QuoteCountryPicker from '@/components/quote-country-picker';
+import { internationalPhone, validateQuoteFields } from '@/lib/quote-validation.mjs';
 
 export type QuoteDetails = { product?: string; color?: string; size?: string };
 
-function phoneValidationMessage(value: string) {
-  if (!value.trim()) return '';
-  const digits = value.replace(/\D/g, '');
-  return /^\+?[\d\s().-]+$/.test(value.trim()) && digits.length >= 7 && digits.length <= 15
-    ? '' : 'Enter a phone number with 7–15 digits. You can include a country code, spaces, or dashes.';
+type QuoteField = 'email' | 'country' | 'phone' | 'subject' | 'message';
+type QuoteErrors = Partial<Record<QuoteField, string>>;
+
+function readFields(form: HTMLFormElement) {
+  const data = new FormData(form);
+  return { email: String(data.get('email') || '').trim(), country: String(data.get('country') || ''), phone: String(data.get('phone') || '').trim(), subject: String(data.get('subject') || '').trim(), message: String(data.get('message') || '').trim() };
 }
 
 export default function QuoteDialog({ details, close }: { details: QuoteDetails; close: () => void }) {
@@ -25,7 +28,31 @@ export default function QuoteDialog({ details, close }: { details: QuoteDetails;
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [replyEmail, setReplyEmail] = useState('');
-  const [phoneError, setPhoneError] = useState('');
+  const [countryCode, setCountryCode] = useState('IN');
+  const [fieldErrors, setFieldErrors] = useState<QuoteErrors>({});
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+
+  const validateField = (form: HTMLFormElement, name: QuoteField, onBlur = false) => {
+    if (!onBlur && !fieldErrors[name] && !hasSubmitted) return;
+    const errors = validateQuoteFields(readFields(form));
+    setFieldErrors(previous => {
+      const next = { ...previous };
+      if (errors[name]) next[name] = errors[name];
+      else delete next[name];
+      if (name === 'country') {
+        if (errors.phone && (previous.phone || hasSubmitted)) next.phone = errors.phone;
+        else delete next.phone;
+      }
+      return next;
+    });
+  };
+
+  const errorProps = (name: QuoteField) => ({
+    'aria-invalid': fieldErrors[name] ? true as const : undefined,
+    'aria-describedby': fieldErrors[name] ? `quote-${name}-error` : undefined,
+  });
+  const fieldError = (name: QuoteField) => fieldErrors[name]
+    ? <span className="quote-input-error" id={`quote-${name}-error`} role="alert"><CircleAlert size={12} aria-hidden="true" />{fieldErrors[name]}</span> : null;
   const subject = details.product ? `Quote for ${details.product}` : 'Garment quote request';
   const message = details.product
     ? `I’d like a quote for ${details.product}${details.color ? ` in ${details.color}` : ''}${details.size ? `, size ${details.size}` : ''}. Please share availability, final price, and delivery options.`
@@ -104,23 +131,19 @@ export default function QuoteDialog({ details, close }: { details: QuoteDetails;
     event.preventDefault();
     if (requestRef.current) return;
     const form = new FormData(event.currentTarget);
-    const email = String(form.get('email') || '').trim();
-    const phone = String(form.get('phone') || '').trim();
-    const subject = String(form.get('subject') || '').trim();
-    const message = String(form.get('message') || '').trim();
-    const phoneError = phoneValidationMessage(phone);
-    if (phoneError) {
-      setPhoneError(phoneError);
-      const input = event.currentTarget.elements.namedItem('phone') as HTMLInputElement;
-      input.setCustomValidity(phoneError);
-      input.reportValidity();
+    const values = readFields(event.currentTarget);
+    const errors = validateQuoteFields(values);
+    setFieldErrors(errors);
+    setHasSubmitted(true);
+    if (Object.keys(errors).length) {
+      setStatus('idle');
+      const firstField = Object.keys(errors)[0];
+      const input = event.currentTarget.elements.namedItem(firstField) as HTMLElement | null;
+      input?.focus();
       return;
     }
-    if (!email || !subject || !message) {
-      setErrorMessage('Please enter your email, a subject, and a message.');
-      setStatus('error');
-      return;
-    }
+    const { email, subject, message } = values;
+    const phone = internationalPhone(values.phone, values.country);
     const controller = new AbortController();
     requestRef.current = controller;
     const timeout = window.setTimeout(() => controller.abort(), 20000);
@@ -129,7 +152,7 @@ export default function QuoteDialog({ details, close }: { details: QuoteDetails;
     try {
       const payload: Record<string, string> = {
           email,
-          ...(phone ? { 'Phone number': phone } : {}),
+          'Phone number': phone,
           'Request subject': subject,
           ...(details.product ? { Product: details.product } : {}),
           ...(details.color ? { Color: details.color } : {}),
@@ -145,7 +168,7 @@ export default function QuoteDialog({ details, close }: { details: QuoteDetails;
       const brandedEndpoint = process.env.NEXT_PUBLIC_QUOTE_API_URL?.trim();
       if (brandedEndpoint) {
         if (brandedDeliveryRef.current.key !== key) brandedDeliveryRef.current = { key, requestId: crypto.randomUUID() };
-        await sendBrandedQuote(brandedEndpoint, { requestId: brandedDeliveryRef.current.requestId, email, phone, subject, message, ...details, honey: String(form.get('_honey') || '') }, controller.signal);
+        await sendBrandedQuote(brandedEndpoint, { requestId: brandedDeliveryRef.current.requestId, email, phone, country: values.country, subject, message, ...details, honey: String(form.get('_honey') || '') }, controller.signal);
         if (requestRef.current !== controller) return;
         setReplyEmail(email);
         setStatus('success');
@@ -204,27 +227,55 @@ export default function QuoteDialog({ details, close }: { details: QuoteDetails;
             <h3>Thank you.<br />Let’s make it happen.</h3>
             <p role="status">Your quote request has been submitted. We’ll reply to <strong>{replyEmail}</strong>.</p>
             <button type="button" className="quote-submit" onClick={dismiss}>Done <ArrowUpRight size={19} /></button>
-          </section> : <form className="quote-form" onSubmit={submit} aria-busy={status === 'sending'}>
+          </section> : <form className="quote-form" noValidate onSubmit={submit} onChange={event => {
+            const input = event.target;
+            if ((input instanceof HTMLInputElement || input instanceof HTMLSelectElement || input instanceof HTMLTextAreaElement) && ['email', 'country', 'phone', 'subject', 'message'].includes(input.name)) validateField(event.currentTarget, input.name as QuoteField);
+          }} onBlur={event => {
+            const input = event.target;
+            if ((input instanceof HTMLInputElement || input instanceof HTMLSelectElement || input instanceof HTMLTextAreaElement) && ['email', 'country', 'phone', 'subject', 'message'].includes(input.name)) validateField(event.currentTarget, input.name as QuoteField, true);
+          }} aria-busy={status === 'sending'}>
             <input type="text" name="_honey" className="quote-honeypot" tabIndex={-1} autoComplete="off" aria-hidden="true" />
             <fieldset disabled={status === 'sending'}>
-            <div className="quote-contact-fields">
-            <label data-quote-reveal>Your email<input name="email" type="email" autoComplete="email" required maxLength={254} placeholder="you@example.com" /></label>
-            <label data-quote-reveal>Phone number (optional)<input name="phone" type="tel" inputMode="tel" autoComplete="tel" maxLength={30} placeholder="+91 98765 43210" aria-invalid={phoneError ? true : undefined} aria-describedby={phoneError ? 'quote-phone-error' : undefined} onChange={event => {
-              const error = phoneValidationMessage(event.currentTarget.value);
-              event.currentTarget.setCustomValidity(error);
-              if (phoneError) setPhoneError(error);
-            }} onBlur={event => {
-              const error = phoneValidationMessage(event.currentTarget.value);
-              event.currentTarget.setCustomValidity(error);
-              setPhoneError(error);
-            }} onInvalid={event => setPhoneError(phoneValidationMessage(event.currentTarget.value))} />
-            {phoneError && <span className="quote-input-error" id="quote-phone-error" role="alert">{phoneError}</span>}
-            </label>
-            </div>
-            <label data-quote-reveal>Subject<input name="subject" required maxLength={160} defaultValue={subject} /></label>
-            <div className="quote-field" data-quote-reveal><label htmlFor="quote-message">Message</label><textarea id="quote-message" name="message" required maxLength={2000} rows={3} defaultValue={message} placeholder="Garments, quantities, sizes, and delivery location…" /></div>
+              <p className="quote-required-note">All fields are required.</p>
+              <div className="quote-contact-fields">
+                <div className="quote-field" data-quote-reveal>
+                  <label htmlFor="quote-email">Your email</label>
+                  <input id="quote-email" name="email" type="email" autoComplete="email" required maxLength={254} placeholder="you@example.com" {...errorProps('email')} />
+                  {fieldError('email')}
+                </div>
+                <div className="quote-field" data-quote-reveal>
+                  <label htmlFor="quote-phone">Phone number</label>
+                  <div className={`quote-phone-control${fieldErrors.phone || fieldErrors.country ? ' has-error' : ''}`}>
+                    <QuoteCountryPicker value={countryCode} dialogRef={dialogRef} disabled={status === 'sending'} onChange={nextCountry => {
+                      setCountryCode(nextCountry);
+                      const form = dialogRef.current?.querySelector('form');
+                      if (!form) return;
+                      const errors = validateQuoteFields({ ...readFields(form), country: nextCountry });
+                      setFieldErrors(previous => {
+                        const next = { ...previous };
+                        delete next.country;
+                        if (errors.phone && (previous.phone || hasSubmitted)) next.phone = errors.phone;
+                        else delete next.phone;
+                        return next;
+                      });
+                    }} />
+                    <input id="quote-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel-national" required maxLength={30} placeholder={countryCode === 'IN' ? '98765 43210' : 'Phone number'} {...errorProps('phone')} />
+                  </div>
+                  {fieldError('country')}{fieldError('phone')}
+                </div>
+              </div>
+              <div className="quote-field" data-quote-reveal>
+                <label htmlFor="quote-subject">Subject</label>
+                <input id="quote-subject" name="subject" required minLength={3} maxLength={160} defaultValue={subject} {...errorProps('subject')} />
+                {fieldError('subject')}
+              </div>
+              <div className="quote-field" data-quote-reveal>
+                <label htmlFor="quote-message">Message</label>
+                <textarea id="quote-message" name="message" required minLength={10} maxLength={2000} rows={3} defaultValue={message} placeholder="Garments, quantities, sizes, and delivery location…" {...errorProps('message')} />
+                {fieldError('message')}
+              </div>
             </fieldset>
-            {status === 'error' && <p className="quote-error" role="alert">{errorMessage} <a href={`tel:${site.contact.phone.replace(/[^+\d]/g, '')}`}>Call {site.contact.phone}</a></p>}
+            {status === 'error' && <p className="quote-error" role="alert"><CircleAlert size={15} aria-hidden="true" /><span>{errorMessage} <a href={`tel:${site.contact.phone.replace(/[^+\d]/g, '')}`}>Call {site.contact.phone}</a></span></p>}
             <span className="sr-only" role="status">{status === 'sending' ? 'Sending your quote request.' : ''}</span>
             <div className="quote-actions" data-quote-reveal>
               <button type="button" className="quote-cancel" onClick={dismiss}>Cancel</button>
