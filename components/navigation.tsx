@@ -8,7 +8,7 @@ import { useModal } from './modal-provider';
 import { site } from '@/data/site';
 import { getWhatsAppUrl } from '@/lib/contact';
 import WhatsAppIcon from './whatsapp-icon';
-const links = [{ name: 'T-Shirts', href: '/#shop' },{ name: 'Bulk orders', href: '/bulk-tshirt-orders/' },{ name: 'About', href: '/#about' },{ name: 'FAQ', href: '/#faq' }];
+const links = [{ name: 'T-Shirts', href: '/#shop' },{ name: 'Bulk orders', href: '/bulk-tshirt-orders/' },{ name: 'Exclusive store', href: '/exclusive-store/' },{ name: 'About', href: '/#about' },{ name: 'FAQ', href: '/#faq' }];
 export default function Navigation() {
  const pathname = usePathname();
  const [scrolled,setScrolled]=useState(false),[menu,setMenu]=useState(false); const modal=useModal(), reduced=useReducedMotion();
@@ -29,6 +29,8 @@ export default function Navigation() {
  },[]);
  useEffect(()=>{ if(!menu)return; const prior=document.activeElement as HTMLElement; const old=document.body.style.overflow; document.body.style.overflow='hidden'; const root=document.getElementById('mobile-menu'); const list=()=>Array.from(root?.querySelectorAll<HTMLElement>('a,button')||[]); list()[0]?.focus(); const onKey=(e:KeyboardEvent)=>{if(e.key==='Escape')setMenu(false);if(e.key==='Tab'){const a=list();if(e.shiftKey&&document.activeElement===a[0]){e.preventDefault();a[a.length-1]?.focus();}else if(!e.shiftKey&&document.activeElement===a[a.length-1]){e.preventDefault();a[0]?.focus();}}};document.addEventListener('keydown',onKey);return()=>{document.body.style.overflow=old;document.removeEventListener('keydown',onKey);prior?.focus();};},[menu]);
  const isJallikattu = pathname?.replace(/\/$/, '') === '/jersey-t-shirt-for-jallikattu';
+ const isExclusiveStore = ['/exclusive-store', '/secret-store', '/secrete-store'].includes(pathname?.replace(/\/$/, '') || '');
+ if (isExclusiveStore) return null;
  const contactActions = <div className="floating-contact-actions" aria-label="Contact THE SK APPARELS">{site.contact.whatsapp && <a className="floating-whatsapp" href={isJallikattu ? getWhatsAppUrl('Hi THE SK APPARELS, I would like to enquire about Jallikattu jersey T-shirts and get a quote.') : getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" aria-label="Chat with THE SK APPARELS on WhatsApp" title="Chat on WhatsApp"><WhatsAppIcon /></a>}<button type="button" className="floating-shop" onClick={()=>modal.openQuote(isJallikattu ? { product: 'Jallikattu jersey T-shirt' } : undefined)}>GET A QUOTE <span>✳</span></button></div>;
  if (isJallikattu) {
   return <>

@@ -1,6 +1,6 @@
 # THE SK APPARELS
 
-An editorial, interactive fashion website built with Next.js App Router, TypeScript, Tailwind CSS, Framer Motion, and Lucide. Content routes and the Atom feed route export as static files. No database, authentication, runtime API routes, server actions, or payment processing are used.
+An editorial, interactive fashion website built with Next.js App Router, TypeScript, Tailwind CSS, Framer Motion, and Lucide. Content routes and the Atom feed route export as static files. The `/exclusive-store/` page connects to ApparelStore's shared API for customer authentication, private collections and the shared shopping bag. No database, runtime API routes, server actions or payment processing are hosted in this frontend. See [exclusive-store setup](EXCLUSIVE_STORE.md).
 
 ## Run and export
 
