@@ -403,7 +403,7 @@ it('reviews an address, adds ₹60 delivery and submits one COD order without cl
   render(<ExclusiveStore />);
   fireEvent.click(await screen.findByRole('button', { name: 'Review order' }));
   expect(
-    screen.getByRole('heading', { name: 'Cash on delivery' }),
+    screen.getByRole('heading', { name: 'Payment method' }),
   ).toBeInTheDocument();
   const place = screen.getByRole('button', { name: /Place order/ });
   expect(place).toHaveTextContent('1,059');
@@ -526,4 +526,38 @@ it('does not offer cancellation for shipped orders', async () => {
   render(<ExclusiveStore />);
   await screen.findByRole('heading', { name: 'Order shipped' });
   expect(screen.queryByRole('button', { name: 'Cancel order' })).not.toBeInTheDocument();
+});
+
+it('applies and removes a coupon using server totals and submits the applied code', async () => {
+  query = 'checkout=1';
+  const discounted = { ...quote, coupon: { code: 'SAVE10', discount: 9990 }, discount: 9990, total: 95910 };
+  const fetch = mockApi((url, options) => {
+    if (url.includes('/checkout?couponCode=SAVE10')) return json(discounted);
+    if (url.endsWith('/orders') && options.method === 'POST') return json({ order });
+  });
+  render(<ExclusiveStore />);
+  const input = await screen.findByLabelText('Coupon code');
+  fireEvent.change(input, { target: { value: 'save10' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Apply coupon' }));
+  expect(await screen.findByText('SAVE10 applied')).toBeInTheDocument();
+  expect(screen.getByText('−₹99.90')).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Remove coupon' }));
+  await waitFor(() => expect(screen.queryByText('SAVE10 applied')).not.toBeInTheDocument());
+  fireEvent.change(input, { target: { value: 'SAVE10' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Apply coupon' }));
+  await screen.findByText('SAVE10 applied');
+  fireEvent.click(screen.getByRole('button', { name: 'Review order' }));
+  fireEvent.click(screen.getByRole('button', { name: /Place order/ }));
+  await waitFor(() => expect(fetch.mock.calls.some(([url, options]) => url.endsWith('/orders') && JSON.parse(String(options.body)).couponCode === 'SAVE10')).toBe(true));
+});
+
+it('shows coupon errors without replacing the last valid server quote', async () => {
+  query = 'checkout=1';
+  mockApi(url => url.includes('/checkout?couponCode=EXPIRED') ? json({ message: 'This coupon has expired.', code: 'COUPON_UNAVAILABLE' }, 400) : undefined);
+  render(<ExclusiveStore />);
+  fireEvent.change(await screen.findByLabelText('Coupon code'), { target: { value: 'EXPIRED' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Apply coupon' }));
+  expect(await screen.findByText('This coupon has expired.')).toBeInTheDocument();
+  expect(screen.getByText('₹1,059.00')).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Remove coupon' })).not.toBeInTheDocument();
 });

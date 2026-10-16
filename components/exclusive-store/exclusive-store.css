@@ -96,3 +96,9 @@
 .ss-profile-menu>a{display:flex;align-items:center;gap:12px;padding:11px 6px;text-align:left;font-size:.85rem;border-radius:6px;min-height:44px}.ss-profile-menu>a:hover{background:#25261f08}
 .ss-orders{max-width:880px}.ss-order-list{display:grid;gap:14px}.ss-order-card{display:grid;gap:10px;padding:20px;background:#faf9f5;border:1px solid var(--line);border-radius:8px;min-width:0}.ss-order-card:hover{border-color:#46623b}.ss-order-card-top,.ss-order-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.ss-order-card-top strong{font-size:.85rem;font-weight:600;overflow-wrap:anywhere}.ss-order-status{font-size:.7rem;text-transform:capitalize;padding:4px 8px;border-radius:4px;background:#e2ecd8;color:#46623b}.ss-order-status[data-status=cancelled]{background:#f8e4df;color:#8c2c20}.ss-order-card time{font-size:.72rem;color:#66685a}.ss-order-card p{font-size:.85rem;overflow-wrap:anywhere}.ss-order-card-bottom{font-size:.78rem;margin-top:4px}.ss-order-card-bottom>span:last-child{display:flex;align-items:center;gap:4px;color:#46623b}.ss-order-confirmation .ss-review-items{text-align:left;margin-top:12px}
 @media(max-width:700px){.ss-order-card{padding:16px}.ss-order-card-top strong{font-size:.8rem}.ss-order-card p{font-size:.8rem}}
+
+.ss-coupon-form { display: grid; gap: 10px; margin: 18px 0; }
+.ss-coupon-form label { font-size: 13px; font-weight: 600; }
+.ss-coupon-form input { width: 100%; min-width: 0; padding: 12px; border: 1px solid #d8d4cf; background: white; color: #202b29; border-radius: 0; }
+.ss-coupon-form input:focus-visible { outline: 2px solid #285f4b; outline-offset: 2px; }
+.ss-coupon-form p { margin: 0; font-size: 13px; }

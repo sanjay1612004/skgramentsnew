@@ -8,7 +8,11 @@ import {
   type Order,
 } from '@/lib/store-api';
 
+import { payWithRazorpay } from '@/lib/razorpay';
+
 const headings: Record<string, string> = {
+  awaiting_payment: 'Complete your payment',
+  payment_review: 'Payment received — order under review',
   confirmed: 'Order placed',
   processing: 'Preparing your order',
   shipped: 'Order shipped',
@@ -24,6 +28,7 @@ export default function OrderConfirmation({
   onExpired: () => void;
 }) {
   const [order, setOrder] = useState<Order | null>(null);
+  const [paying, setPaying] = useState(false);
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
   const [confirmCancel, setConfirmCancel] = useState(false);
@@ -91,12 +96,20 @@ export default function OrderConfirmation({
       <p>
         {order.status === 'cancelled'
           ? 'This order has been cancelled.'
-          : order.paymentStatus === 'paid'
-            ? 'Payment received.'
-            : order.status === 'delivered'
+          : order.total === 0
+            ? 'No payment is required.'
+            : order.paymentStatus === 'paid'
+            ? (order.status === 'payment_review' ? 'Payment received. The store will contact you to confirm availability or arrange a refund.' : 'Payment received.')
+            : order.paymentMethod === 'razorpay' ? 'Your order is awaiting online payment. Stock is confirmed after payment.' : order.status === 'delivered'
               ? `Payment due: ${price(order.total, order.currency)}.`
               : `Pay ${price(order.total, order.currency)} on delivery.`}
       </p>
+      {order.status === 'awaiting_payment' && <button type="button" className="button dark" disabled={paying} onClick={async () => {
+        setPaying(true); setError('');
+        try { setOrder(await payWithRazorpay(order._id)); } catch (error) { setError(error instanceof Error ? error.message : 'Could not complete payment.'); }
+        finally { setPaying(false); }
+      }}>{paying ? 'Opening payment…' : 'Pay ' + price(order.total, order.currency)}</button>}
+      {order.paymentMethod === 'razorpay' && <button type="button" className="ss-text-button" disabled={paying} onClick={() => setRetry(value => value + 1)}>Refresh payment status</button>}
       <div className="ss-checkout-panel">
         <h2>Your items</h2>
         <ul className="ss-review-items">
@@ -134,6 +147,7 @@ export default function OrderConfirmation({
             <dt>Items</dt>
             <dd>{price(order.subtotal, order.currency)}</dd>
           </div>
+          {!!order.discount && <div><dt>Coupon {order.coupon?.code}</dt><dd>−{price(order.discount, order.currency)}</dd></div>}
           <div>
             <dt>Delivery</dt>
             <dd>{price(order.shipping, order.currency)}</dd>
@@ -144,7 +158,7 @@ export default function OrderConfirmation({
           </div>
         </dl>
       </div>
-      {['confirmed', 'processing'].includes(order.status) && order.paymentMethod === 'cod' && order.paymentStatus === 'unpaid' && <div className="ss-order-cancel">{confirmCancel ? <div className="ss-checkout-panel"><h2>Cancel this order?</h2><p>This cancels the entire order.</p><div className="ss-address-form-actions"><button type="button" className="button outline" disabled={cancelling} onClick={() => setConfirmCancel(false)}>Keep order</button><button type="button" className="button dark" disabled={cancelling} onClick={() => void cancel()}>{cancelling ? 'Cancelling…' : 'Confirm cancellation'}</button></div></div> : <button type="button" className="ss-text-button" onClick={() => setConfirmCancel(true)}>Cancel order</button>}</div>}
+      {['confirmed', 'processing'].includes(order.status) && order.paymentMethod === 'cod' && (order.paymentStatus === 'unpaid' || order.total === 0) && <div className="ss-order-cancel">{confirmCancel ? <div className="ss-checkout-panel"><h2>Cancel this order?</h2><p>This cancels the entire order.</p><div className="ss-address-form-actions"><button type="button" className="button outline" disabled={cancelling} onClick={() => setConfirmCancel(false)}>Keep order</button><button type="button" className="button dark" disabled={cancelling} onClick={() => void cancel()}>{cancelling ? 'Cancelling…' : 'Confirm cancellation'}</button></div></div> : <button type="button" className="ss-text-button" onClick={() => setConfirmCancel(true)}>Cancel order</button>}</div>}
     </section>
   );
 }

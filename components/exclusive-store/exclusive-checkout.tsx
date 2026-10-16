@@ -12,6 +12,7 @@ import {
   type Customer,
   type Order,
 } from '@/lib/store-api';
+import { payWithRazorpay } from '@/lib/razorpay';
 import DeliveryAddressForm from './delivery-address-form';
 import type { StoreCart } from './use-store-cart';
 
@@ -27,11 +28,16 @@ export default function ExclusiveCheckout({
   const [quote, setQuote] = useState<CheckoutQuote | null>(null);
   const [selected, setSelected] = useState('');
   const [addingAddress, setAddingAddress] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('cod');
   const [review, setReview] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [retry, setRetry] = useState(0);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponBusy, setCouponBusy] = useState(false);
+  const [couponError, setCouponError] = useState('');
+  const couponPending = useRef(false);
   const pending = useRef(false);
   const requestId = useRef('');
   const loadError = useCallback(
@@ -54,6 +60,9 @@ export default function ExclusiveCheckout({
         if (controller.signal.aborted) return;
         setCustomer(profile);
         setQuote(result);
+        setCouponCode('');
+        setCouponError('');
+        setPaymentMethod(current => result.paymentMethods.includes(current) ? current : 'cod');
         setLoading(false);
         setError('');
         setReview(false);
@@ -76,11 +85,28 @@ export default function ExclusiveCheckout({
     return () => controller.abort();
   }, [retry, loadError]);
   const address = customer?.addresses?.find((item) => item._id === selected);
+  async function applyCoupon(remove = false) {
+    if (pending.current || couponPending.current) return;
+    couponPending.current = true;
+    setCouponBusy(true); setCouponError('');
+    try {
+      const code = remove ? '' : couponCode.trim().toUpperCase();
+      if (!remove && !code) throw new Error('Enter a coupon code.');
+      const result = await storeRequest<CheckoutQuote>('/checkout' + (code ? '?couponCode=' + encodeURIComponent(code) : ''));
+      setQuote(result); setCouponCode(result.coupon?.code || ''); setError('');
+      setPaymentMethod(current => result.paymentMethods.includes(current) ? current : 'cod');
+      requestId.current = '';
+    } catch (error) {
+      if (error instanceof StoreApiError && error.status === 401) onExpired();
+      else setCouponError(error instanceof Error ? error.message : 'Could not update coupon.');
+    } finally { couponPending.current = false; setCouponBusy(false); }
+  }
   async function submit() {
     if (
       !quote ||
       !address ||
       pending.current ||
+      couponPending.current ||
       !quote.cart.summary.checkoutEligible ||
       error
     )
@@ -100,10 +126,15 @@ export default function ExclusiveCheckout({
         body: JSON.stringify({
           addressId: address._id,
           quoteToken: quote.quoteToken,
-          paymentMethod: 'cod',
+          paymentMethod,
           requestId: requestId.current,
+          ...(quote.coupon ? { couponCode: quote.coupon.code } : {}),
         }),
       });
+      if (paymentMethod === 'razorpay') {
+        try { await payWithRazorpay(order._id); }
+        catch { router.replace(exclusiveLink({ order: order._id })); return; }
+      }
       void cartResource.refresh();
       router.replace(exclusiveLink({ order: order._id }));
     } catch (error) {
@@ -281,12 +312,11 @@ export default function ExclusiveCheckout({
                 <section className="ss-checkout-panel">
                   <h2>
                     <Banknote size={18} aria-hidden="true" />
-                    Cash on delivery
+                    Payment method
                   </h2>
-                  <p>
-                    Pay {price(quote.total, quote.currency)} when your order
-                    arrives.
-                  </p>
+                  <label><input type="radio" name="paymentMethod" checked={paymentMethod === 'cod'} disabled={busy} onChange={() => { setPaymentMethod('cod'); requestId.current = ''; }} /> Cash on delivery</label>
+                  {quote.paymentMethods.includes('razorpay') && <label><input type="radio" name="paymentMethod" checked={paymentMethod === 'razorpay'} disabled={busy} onChange={() => { setPaymentMethod('razorpay'); requestId.current = ''; }} /> Pay online with Razorpay</label>}
+                  <p>{paymentMethod === 'cod' ? 'Pay when your order arrives.' : 'Pay securely with Razorpay. Stock is confirmed after payment; if unavailable, the store will contact you to fulfill or refund.'}</p>
                 </section>
                 <section className="ss-checkout-panel">
                   <h2>Your items</h2>
@@ -315,6 +345,13 @@ export default function ExclusiveCheckout({
           </div>
           <aside className="ss-bag-summary">
             <h2>Order summary</h2>
+            <form className="ss-coupon-form" onSubmit={event => { event.preventDefault(); void applyCoupon(); }}>
+              <label htmlFor="checkout-coupon">Coupon code</label>
+              <input id="checkout-coupon" value={couponCode} maxLength={32} autoCapitalize="characters" autoComplete="off" disabled={busy || couponBusy} onChange={event => setCouponCode(event.target.value)} />
+              <button type="submit" className="button outline" disabled={busy || couponBusy}>{couponBusy ? 'Updating…' : 'Apply coupon'}</button>
+              {quote.coupon && <><p role="status">{quote.coupon.code} applied</p><button type="button" className="ss-text-button" disabled={busy || couponBusy} onClick={() => void applyCoupon(true)}>Remove coupon</button></>}
+              {couponError && <p className="ss-error" role="alert">{couponError}</p>}
+            </form>
             <dl>
               <div>
                 <dt>Subtotal</dt>
@@ -324,6 +361,7 @@ export default function ExclusiveCheckout({
                 <dt>Delivery within India</dt>
                 <dd>{price(quote.shipping, quote.currency)}</dd>
               </div>
+              {!!quote.discount && <div><dt>Coupon {quote.coupon?.code}</dt><dd>−{price(quote.discount, quote.currency)}</dd></div>}
               <div className="ss-checkout-total">
                 <dt>Total</dt>
                 <dd>{price(quote.total, quote.currency)}</dd>
@@ -355,15 +393,15 @@ export default function ExclusiveCheckout({
               <button
                 type="button"
                 className="button dark full"
-                disabled={busy || Boolean(error)}
+                disabled={busy || couponBusy || Boolean(error)}
                 onClick={() => void submit()}
               >
                 {busy
                   ? 'Placing order…'
-                  : 'Place order · ' + price(quote.total, quote.currency)}
+                  : (paymentMethod === 'razorpay' ? 'Pay online · ' : 'Place order · ') + price(quote.total, quote.currency)}
               </button>
             )}
-            <p className="ss-help">Cash on delivery · India only</p>
+            <p className="ss-help">Delivery within India</p>
           </aside>
         </div>
       )}
