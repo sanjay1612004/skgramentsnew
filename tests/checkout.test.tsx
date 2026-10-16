@@ -598,3 +598,14 @@ it('refreshes payment settings on focus and replaces a disabled selection', asyn
   expect(screen.getByRole('radio', { name: 'Pay online with Razorpay' })).toBeChecked();
   expect(screen.getByText(/Payment options or order totals changed/)).toBeInTheDocument();
 });
+
+it('refreshes customer order history to Delivered when returning to the page', async () => {
+  query = 'orders=1';
+  let status = 'shipped';
+  mockApi(url => url.includes('/orders?') ? json({ data: [{ ...order, status, createdAt: '2026-10-15T12:00:00.000Z' }], pagination: { page: 1, pages: 1, total: 1 } }) : undefined);
+  render(<ExclusiveStore />);
+  expect(await screen.findByText('shipped')).toBeInTheDocument();
+  status = 'delivered';
+  fireEvent.focus(window);
+  expect(await screen.findByText('delivered')).toBeInTheDocument();
+});

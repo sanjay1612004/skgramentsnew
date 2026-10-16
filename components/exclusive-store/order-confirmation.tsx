@@ -31,6 +31,17 @@ export default function OrderConfirmation({
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
+  useEffect(() => {
+    const refresh = () => { if (document.visibilityState === 'visible') setRetry(value => value + 1); };
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    const timer = window.setInterval(refresh, 30000);
+    return () => {
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+      window.clearInterval(timer);
+    };
+  }, []);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   async function cancel() {
