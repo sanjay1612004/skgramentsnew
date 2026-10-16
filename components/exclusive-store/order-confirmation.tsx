@@ -158,7 +158,7 @@ export default function OrderConfirmation({
           </div>
         </dl>
       </div>
-      {['confirmed', 'processing'].includes(order.status) && order.paymentMethod === 'cod' && (order.paymentStatus === 'unpaid' || order.total === 0) && <div className="ss-order-cancel">{confirmCancel ? <div className="ss-checkout-panel"><h2>Cancel this order?</h2><p>This cancels the entire order.</p><div className="ss-address-form-actions"><button type="button" className="button outline" disabled={cancelling} onClick={() => setConfirmCancel(false)}>Keep order</button><button type="button" className="button dark" disabled={cancelling} onClick={() => void cancel()}>{cancelling ? 'Cancelling…' : 'Confirm cancellation'}</button></div></div> : <button type="button" className="ss-text-button" onClick={() => setConfirmCancel(true)}>Cancel order</button>}</div>}
+      {['confirmed', 'processing'].includes(order.status) && ['cod', 'free'].includes(order.paymentMethod) && (order.paymentStatus === 'unpaid' || order.total === 0) && <div className="ss-order-cancel">{confirmCancel ? <div className="ss-checkout-panel"><h2>Cancel this order?</h2><p>This cancels the entire order.</p><div className="ss-address-form-actions"><button type="button" className="button outline" disabled={cancelling} onClick={() => setConfirmCancel(false)}>Keep order</button><button type="button" className="button dark" disabled={cancelling} onClick={() => void cancel()}>{cancelling ? 'Cancelling…' : 'Confirm cancellation'}</button></div></div> : <button type="button" className="ss-text-button" onClick={() => setConfirmCancel(true)}>Cancel order</button>}</div>}
     </section>
   );
 }

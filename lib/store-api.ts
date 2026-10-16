@@ -49,7 +49,7 @@ export type CartItem = {
   variant?: { sku: string; options?: Variant['options'] }; issue?: { message: string };
 };
 export type Cart = { items: CartItem[]; summary: { itemCount: number; subtotal: number; currency: string | null; discountTotal: number; checkoutEligible: boolean; issueCount: number } };
-export type CheckoutQuote = { discount?: number; coupon?: { code: string; discount: number } | null; freeDeliveryThreshold?: number | null; cart: Cart; quoteToken: string; shipping: number; total: number; currency: string; countryCode: string; paymentMethods: string[] };
+export type CheckoutQuote = { paymentMessage?: string; paymentSettingsRevision?: number; discount?: number; coupon?: { code: string; discount: number } | null; freeDeliveryThreshold?: number | null; cart: Cart; quoteToken: string; shipping: number; total: number; currency: string; countryCode: string; paymentMethods: string[] };
 export type Order = { discount?: number; coupon?: { code: string; discount: number } | null; _id: string; number: string; status: string; paymentMethod: string; paymentStatus: string; shippingAddress: Address; currency: string; subtotal: number; shipping: number; total: number; createdAt: string; items: { variantId: string; name: string; color?: string; size?: string; quantity: number; unitPrice: number; lineTotal: number }[] };
 
 export function price(amount: number | undefined, currency = 'INR') {

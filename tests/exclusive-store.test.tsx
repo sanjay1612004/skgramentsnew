@@ -170,10 +170,9 @@ it('opens profile actions, saves profile edits and updates the navbar avatar', a
   expect(screen.getByRole('dialog', { name: 'Your profile' })).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Edit profile' }));
   fireEvent.change(screen.getByLabelText('First name'), { target: { value: 'Kishore' } });
-  fireEvent.change(screen.getByLabelText('Profile picture URL'), { target: { value: updated.avatarUrl } });
   fireEvent.click(screen.getByRole('button', { name: 'Save profile' }));
   await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-  expect(fetch).toHaveBeenCalledWith('http://localhost:1234/profile/edit', expect.objectContaining({ method: 'PATCH', credentials: 'include', body: JSON.stringify({ firstName: 'Kishore', lastName: 'Customer', phone: '', avatarUrl: updated.avatarUrl }) }));
+  expect(fetch).toHaveBeenCalledWith('http://localhost:1234/profile/edit', expect.objectContaining({ method: 'PATCH', credentials: 'include', body: JSON.stringify({ firstName: 'Kishore', lastName: 'Customer', phone: '' }) }));
   expect(within(screen.getByRole('button', { name: 'Open profile menu' })).getByAltText('')).toHaveAttribute('src', updated.avatarUrl);
 });
 
@@ -257,4 +256,26 @@ it('does not revive a logged-out session when an older profile check finishes la
   await screen.findByText('Sign in to browse the exclusive collection.');
   await act(async () => { finish(new Response(JSON.stringify(customer))); });
   await waitFor(() => expect(screen.queryByRole('button', { name: 'Open profile menu' })).not.toBeInTheDocument());
+});
+
+it('updates the header photo immediately while keeping profile editing open', async () => {
+  const updated = { ...customer, avatarUrl: 'https://example.com/uploaded-profile.png' };
+  const fetch = vi.fn((url: string, options?: RequestInit) => {
+    if (url.endsWith('/profile/photo')) return response({ user: options?.method === 'DELETE' ? { ...customer, avatarUrl: null } : updated });
+    if (url.endsWith('/profile')) return response(customer);
+    return response({ data: [category] });
+  });
+  vi.stubGlobal('fetch', fetch);
+  render(<ExclusiveStore />);
+  fireEvent.click(await screen.findByRole('button', { name: 'Open profile menu' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Edit profile' }));
+  fireEvent.change(screen.getByLabelText('First name'), { target: { value: 'Unsaved name' } });
+  fireEvent.change(screen.getByLabelText('Profile photo'), { target: { files: [new File(['photo'], 'profile.png', { type: 'image/png' })] } });
+  await screen.findByText('Profile photo updated.');
+  expect(within(screen.getByRole('button', { name: 'Open profile menu' })).getByAltText('')).toHaveAttribute('src', updated.avatarUrl);
+  expect(screen.getByRole('dialog', { name: 'Your profile' })).toBeInTheDocument();
+  expect(screen.getByLabelText('First name')).toHaveValue('Unsaved name');
+  fireEvent.click(screen.getByRole('button', { name: 'Remove photo' }));
+  await screen.findByText('Profile photo removed.');
+  expect(within(screen.getByRole('button', { name: 'Open profile menu' })).queryByAltText('')).not.toBeInTheDocument();
 });

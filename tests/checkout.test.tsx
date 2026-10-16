@@ -561,3 +561,40 @@ it('shows coupon errors without replacing the last valid server quote', async ()
   expect(screen.getByText('₹1,059.00')).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Remove coupon' })).not.toBeInTheDocument();
 });
+
+it('renders separate payment cards and selects Razorpay when COD is disabled', async () => {
+  query = 'checkout=1';
+  mockApi(url => url.endsWith('/checkout') ? json({ ...quote, paymentMethods: ['razorpay'] }) : undefined);
+  render(<ExclusiveStore />);
+  fireEvent.click(await screen.findByRole('button', { name: 'Review order' }));
+  expect(screen.queryByRole('radio', { name: 'Cash on delivery' })).not.toBeInTheDocument();
+  const online = screen.getByRole('radio', { name: 'Pay online with Razorpay' });
+  expect(online).toBeChecked();
+  expect(online.closest('label')).toHaveClass('ss-payment-option');
+  expect(screen.getByRole('button', { name: /Pay online ·/ })).toBeEnabled();
+});
+
+it('pauses checkout when both payment methods are disabled', async () => {
+  query = 'checkout=1';
+  mockApi(url => url.endsWith('/checkout') ? json({ ...quote, paymentMethods: [], paymentMessage: 'Checkout is temporarily unavailable.' }) : undefined);
+  render(<ExclusiveStore />);
+  fireEvent.click(await screen.findByRole('button', { name: 'Review order' }));
+  expect(screen.getByRole('alert')).toHaveTextContent('Checkout is temporarily unavailable.');
+  expect(screen.queryByRole('radio', { name: 'Cash on delivery' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('radio', { name: 'Pay online with Razorpay' })).not.toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Place order ·/ })).toBeDisabled();
+});
+
+it('refreshes payment settings on focus and replaces a disabled selection', async () => {
+  query = 'checkout=1';
+  let onlineOnly = false;
+  mockApi(url => url.endsWith('/checkout') ? json({ ...quote, quoteToken: onlineOnly ? 'b'.repeat(64) : quote.quoteToken, paymentMethods: onlineOnly ? ['razorpay'] : ['cod', 'razorpay'] }) : undefined);
+  render(<ExclusiveStore />);
+  fireEvent.click(await screen.findByRole('button', { name: 'Review order' }));
+  expect(screen.getByRole('radio', { name: 'Cash on delivery' })).toBeChecked();
+  onlineOnly = true;
+  fireEvent.focus(window);
+  await waitFor(() => expect(screen.queryByRole('radio', { name: 'Cash on delivery' })).not.toBeInTheDocument());
+  expect(screen.getByRole('radio', { name: 'Pay online with Razorpay' })).toBeChecked();
+  expect(screen.getByText(/Payment options or order totals changed/)).toBeInTheDocument();
+});

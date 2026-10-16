@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Banknote, MapPin } from 'lucide-react';
+import { Banknote, MapPin, CreditCard, Check, ShieldCheck } from 'lucide-react';
 import {
   StoreApiError,
   storeRequest,
@@ -28,7 +28,9 @@ export default function ExclusiveCheckout({
   const [quote, setQuote] = useState<CheckoutQuote | null>(null);
   const [selected, setSelected] = useState('');
   const [addingAddress, setAddingAddress] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [checkoutNotice, setCheckoutNotice] = useState('');
+  const currentQuote = useRef<CheckoutQuote | null>(null);
   const [review, setReview] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -62,9 +64,10 @@ export default function ExclusiveCheckout({
         setQuote(result);
         setCouponCode('');
         setCouponError('');
-        setPaymentMethod(current => result.paymentMethods.includes(current) ? current : 'cod');
+        setPaymentMethod(current => result.paymentMethods.includes(current) ? current : result.paymentMethods[0] || '');
         setLoading(false);
         setError('');
+        setCheckoutNotice('');
         setReview(false);
         requestId.current = '';
         setSelected((current) =>
@@ -84,6 +87,35 @@ export default function ExclusiveCheckout({
       });
     return () => controller.abort();
   }, [retry, loadError]);
+  useEffect(() => { currentQuote.current = quote; }, [quote]);
+  const hasQuote = Boolean(quote);
+  const appliedCode = quote?.coupon?.code || '';
+  useEffect(() => {
+    if (!hasQuote) return;
+    const controller = new AbortController();
+    let refreshing = false;
+    async function refreshOptions() {
+      if (document.visibilityState === 'hidden' || refreshing || pending.current || couponPending.current) return;
+      refreshing = true;
+      try {
+        const result = await storeRequest<CheckoutQuote>('/checkout' + (appliedCode ? '?couponCode=' + encodeURIComponent(appliedCode) : ''), { signal: controller.signal });
+        if (controller.signal.aborted || pending.current || couponPending.current) return;
+        if (currentQuote.current?.quoteToken !== result.quoteToken) {
+          setQuote(result);
+          setPaymentMethod(current => result.paymentMethods.includes(current) ? current : result.paymentMethods[0] || '');
+          setCheckoutNotice('Payment options or order totals changed. Please review the latest details.');
+          requestId.current = '';
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) loadError(error);
+      } finally { refreshing = false; }
+    }
+    const interval = window.setInterval(() => void refreshOptions(), 30000);
+    const refresh = () => void refreshOptions();
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    return () => { controller.abort(); window.clearInterval(interval); window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh); };
+  }, [hasQuote, appliedCode, loadError]);
   const address = customer?.addresses?.find((item) => item._id === selected);
   async function applyCoupon(remove = false) {
     if (pending.current || couponPending.current) return;
@@ -94,7 +126,7 @@ export default function ExclusiveCheckout({
       if (!remove && !code) throw new Error('Enter a coupon code.');
       const result = await storeRequest<CheckoutQuote>('/checkout' + (code ? '?couponCode=' + encodeURIComponent(code) : ''));
       setQuote(result); setCouponCode(result.coupon?.code || ''); setError('');
-      setPaymentMethod(current => result.paymentMethods.includes(current) ? current : 'cod');
+      setPaymentMethod(current => result.paymentMethods.includes(current) ? current : result.paymentMethods[0] || '');
       requestId.current = '';
     } catch (error) {
       if (error instanceof StoreApiError && error.status === 401) onExpired();
@@ -108,6 +140,7 @@ export default function ExclusiveCheckout({
       pending.current ||
       couponPending.current ||
       !quote.cart.summary.checkoutEligible ||
+      !quote.paymentMethods.includes(paymentMethod) ||
       error
     )
       return;
@@ -309,14 +342,25 @@ export default function ExclusiveCheckout({
                     <span>{address?.phone}</span>
                   </address>
                 </section>
-                <section className="ss-checkout-panel">
-                  <h2>
-                    <Banknote size={18} aria-hidden="true" />
-                    Payment method
-                  </h2>
-                  <label><input type="radio" name="paymentMethod" checked={paymentMethod === 'cod'} disabled={busy} onChange={() => { setPaymentMethod('cod'); requestId.current = ''; }} /> Cash on delivery</label>
-                  {quote.paymentMethods.includes('razorpay') && <label><input type="radio" name="paymentMethod" checked={paymentMethod === 'razorpay'} disabled={busy} onChange={() => { setPaymentMethod('razorpay'); requestId.current = ''; }} /> Pay online with Razorpay</label>}
-                  <p>{paymentMethod === 'cod' ? 'Pay when your order arrives.' : 'Pay securely with Razorpay. Stock is confirmed after payment; if unavailable, the store will contact you to fulfill or refund.'}</p>
+                <section className="ss-checkout-panel ss-payment-panel">
+                  <h2 id="payment-method-title"><CreditCard size={19} aria-hidden="true" />Payment method</h2>
+                  <p className="ss-payment-intro">Choose how you’d like to pay.</p>
+                  {quote.paymentMethods.length ? <fieldset className="ss-payment-options" aria-labelledby="payment-method-title">
+                    {quote.paymentMethods.map(method => {
+                      const isSelected = paymentMethod === method;
+                      const title = method === 'cod' ? 'Cash on delivery' : method === 'free' ? 'No payment required' : 'Pay online with Razorpay';
+                      const description = method === 'cod' ? 'Pay when your order arrives.' : method === 'free' ? 'Your order total is ₹0.' : 'Pay securely online through Razorpay.';
+                      const PaymentIcon = method === 'cod' ? Banknote : method === 'free' ? Check : CreditCard;
+                      return <label key={method} className="ss-payment-option" data-selected={isSelected}>
+                        <input type="radio" name="paymentMethod" aria-label={title} value={method} checked={isSelected} disabled={busy || couponBusy} onChange={() => { setPaymentMethod(method); requestId.current = ''; }} />
+                        <span className="ss-payment-icon"><PaymentIcon size={21} aria-hidden="true" /></span>
+                        <span className="ss-payment-copy"><strong>{title}</strong><span>{description}</span></span>
+                        {isSelected && <span className="ss-payment-selected"><Check size={13} aria-hidden="true" />Selected</span>}
+                      </label>;
+                    })}
+                  </fieldset> : <div className="ss-payment-unavailable" role="alert">{quote.paymentMessage || 'Checkout is temporarily unavailable. Please try again later or contact the store.'}</div>}
+                  {paymentMethod === 'razorpay' && <p className="ss-payment-note">Stock is confirmed after payment. If an item becomes unavailable, we’ll contact you to fulfill your order or arrange a refund.</p>}
+                  <div className="ss-payment-footer"><ShieldCheck size={15} aria-hidden="true" /><span>Your order total is confirmed before payment.</span></div>
                 </section>
                 <section className="ss-checkout-panel">
                   <h2>Your items</h2>
@@ -367,6 +411,7 @@ export default function ExclusiveCheckout({
                 <dd>{price(quote.total, quote.currency)}</dd>
               </div>
             </dl>
+            {checkoutNotice && <p className="ss-checkout-notice" role="status">{checkoutNotice}</p>}
             {error && (
               <div className="ss-error" role="alert">
                 {error}
@@ -393,7 +438,7 @@ export default function ExclusiveCheckout({
               <button
                 type="button"
                 className="button dark full"
-                disabled={busy || couponBusy || Boolean(error)}
+                disabled={busy || couponBusy || Boolean(error) || !quote.paymentMethods.includes(paymentMethod)}
                 onClick={() => void submit()}
               >
                 {busy
