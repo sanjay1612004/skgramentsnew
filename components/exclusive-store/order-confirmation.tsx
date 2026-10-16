@@ -1,9 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Check } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowRight, Check, Clock3, CreditCard, MapPin, PackageCheck, ShoppingBag, X } from 'lucide-react';
 import {
   StoreApiError,
   storeRequest,
+  exclusiveLink,
   price,
   type Order,
 } from '@/lib/store-api';
@@ -96,33 +98,56 @@ export default function OrderConfirmation({
         Loading your order…
       </div>
     );
-  return (
-    <section className="ss-catalog ss-order-confirmation">
-      <div className="ss-order-check">
-        <Check size={28} aria-hidden="true" />
-      </div>
-      <h1>{headings[order.status] || 'Your order'}</h1>
-      <p className="ss-order-number">{order.number}</p>
-      {error && <p className="ss-error" role="alert">{error}</p>}
-      <p>
-        {order.status === 'cancelled'
-          ? 'This order has been cancelled.'
-          : order.total === 0
-            ? 'No payment is required.'
-            : order.paymentStatus === 'paid'
-            ? (order.status === 'payment_review' ? 'Payment received. The store will contact you to confirm availability or arrange a refund.' : 'Payment received.')
-            : order.paymentMethod === 'razorpay' ? 'Your order is awaiting online payment. Stock is confirmed after payment.' : order.status === 'delivered'
+  const isCancelled = order.status === 'cancelled';
+  const isAwaitingPayment = order.status === 'awaiting_payment';
+  const isPaymentReview = order.status === 'payment_review';
+  const isPaid = order.paymentStatus === 'paid' && !isCancelled && !isAwaitingPayment && !isPaymentReview;
+  const isComplete = !isCancelled && !isAwaitingPayment && !isPaymentReview;
+  const isCOD = order.paymentMethod === 'cod';
+  const message = isCancelled
+    ? 'This order has been cancelled.'
+    : isPaymentReview
+      ? 'Payment received. The store will contact you to confirm availability or arrange a refund.'
+      : order.total === 0
+        ? 'No payment is required. We’ll take it from here.'
+        : isPaid
+          ? 'Payment received. Your order is in good hands.'
+          : isAwaitingPayment
+            ? 'Your order is awaiting online payment. Stock is confirmed after payment.'
+            : order.status === 'delivered'
               ? `Payment due: ${price(order.total, order.currency)}.`
-              : `Pay ${price(order.total, order.currency)} on delivery.`}
-      </p>
-      {order.status === 'awaiting_payment' && <button type="button" className="button dark" disabled={paying} onClick={async () => {
-        setPaying(true); setError('');
-        try { setOrder(await payWithRazorpay(order._id)); } catch (error) { setError(error instanceof Error ? error.message : 'Could not complete payment.'); }
-        finally { setPaying(false); }
-      }}>{paying ? 'Opening payment…' : 'Pay ' + price(order.total, order.currency)}</button>}
-      {order.paymentMethod === 'razorpay' && <button type="button" className="ss-text-button" disabled={paying} onClick={() => setRetry(value => value + 1)}>Refresh payment status</button>}
+              : `Pay ${price(order.total, order.currency)} on delivery.`;
+  const HeroIcon = isCancelled ? X : isAwaitingPayment ? CreditCard : isPaymentReview ? Clock3 : order.status === 'delivered' ? PackageCheck : Check;
+  return (
+    <section className="ss-catalog ss-order-confirmation" data-state={isPaid ? 'paid' : isComplete ? 'placed' : isCancelled ? 'cancelled' : 'pending'}>
+      <div className="ss-confirmation-hero">
+        {isPaid && <div className="ss-confirmation-confetti" aria-hidden="true">{Array.from({ length: 16 }, (_, index) => <i key={index} style={{ left: `${(index + 1) * 5.88}%`, animationDelay: `${(index % 5) * 110}ms` }} />)}</div>}
+        <div className="ss-confirmation-hero-content">
+          <span className="ss-confirmation-eyebrow">THE SK APPARELS <span aria-hidden="true">/</span> EXCLUSIVE STORE</span>
+          <div className="ss-order-check"><HeroIcon size={30} strokeWidth={1.8} aria-hidden="true" /></div>
+          <span className="ss-confirmation-status">{isPaid ? 'Payment confirmed' : isAwaitingPayment ? 'Payment pending' : isPaymentReview ? 'Under review' : isCancelled ? 'Cancelled' : isCOD ? 'Cash on delivery' : 'Order confirmed'}</span>
+          <h1>{headings[order.status] || 'Your order'}</h1>
+          <p className="ss-confirmation-message">{message}</p>
+          {error && <p className="ss-error" role="alert">{error}</p>}
+          {isAwaitingPayment && <button type="button" className="button dark ss-confirmation-pay" disabled={paying} onClick={async () => {
+            setPaying(true); setError('');
+            try { setOrder(await payWithRazorpay(order._id)); } catch (error) { setError(error instanceof Error ? error.message : 'Could not complete payment.'); }
+            finally { setPaying(false); }
+          }}>{paying ? 'Opening payment…' : 'Pay ' + price(order.total, order.currency)}</button>}
+          {order.paymentMethod === 'razorpay' && !isPaid && <button type="button" className="ss-text-button" disabled={paying} onClick={() => setRetry(value => value + 1)}>Refresh payment status</button>}
+          <div className="ss-confirmation-actions">
+            <Link className="button dark" href={exclusiveLink({ orders: 1 })}>View my orders <ArrowRight size={17} aria-hidden="true" /></Link>
+            <Link className="button outline" href={exclusiveLink()}>Continue shopping</Link>
+          </div>
+        </div>
+        <div className="ss-confirmation-ticket" aria-label="Order receipt">
+          <div><span>ORDER NUMBER</span><strong className="ss-order-number">{order.number}</strong></div>
+          <div><span>{isPaid ? 'AMOUNT PAID' : isCOD && !isCancelled ? 'PAY ON DELIVERY' : 'ORDER TOTAL'}</span><strong>{price(order.total, order.currency)}</strong></div>
+        </div>
+      </div>
+      <div className="ss-confirmation-details">
       <div className="ss-checkout-panel">
-        <h2>Your items</h2>
+        <h2><ShoppingBag size={18} aria-hidden="true" />Your items</h2>
         <ul className="ss-review-items">
           {order.items.map((item) => (
             <li key={item.variantId}>
@@ -139,7 +164,8 @@ export default function OrderConfirmation({
         </ul>
       </div>
       <div className="ss-checkout-panel">
-        <h2>Delivery address</h2>
+        <h2><MapPin size={18} aria-hidden="true" />Delivery & payment</h2>
+        <span className="ss-confirmation-label">DELIVER TO</span>
         <address>
           <strong>{order.shippingAddress.recipientName}</strong>
           <span>
@@ -153,6 +179,8 @@ export default function OrderConfirmation({
             {order.shippingAddress.postalCode}
           </span>
         </address>
+        <span className="ss-confirmation-label ss-confirmation-payment-label">PAYMENT METHOD</span>
+        <p className="ss-confirmation-payment-method">{isCOD ? 'Cash on delivery' : order.paymentMethod === 'razorpay' ? 'Razorpay' : 'No payment required'}</p>
         <dl className="ss-confirmation-totals">
           <div>
             <dt>Items</dt>
@@ -168,6 +196,7 @@ export default function OrderConfirmation({
             <dd>{price(order.total, order.currency)}</dd>
           </div>
         </dl>
+      </div>
       </div>
       {['confirmed', 'processing'].includes(order.status) && ['cod', 'free'].includes(order.paymentMethod) && (order.paymentStatus === 'unpaid' || order.total === 0) && <div className="ss-order-cancel">{confirmCancel ? <div className="ss-checkout-panel"><h2>Cancel this order?</h2><p>This cancels the entire order.</p><div className="ss-address-form-actions"><button type="button" className="button outline" disabled={cancelling} onClick={() => setConfirmCancel(false)}>Keep order</button><button type="button" className="button dark" disabled={cancelling} onClick={() => void cancel()}>{cancelling ? 'Cancelling…' : 'Confirm cancellation'}</button></div></div> : <button type="button" className="ss-text-button" onClick={() => setConfirmCancel(true)}>Cancel order</button>}</div>}
     </section>

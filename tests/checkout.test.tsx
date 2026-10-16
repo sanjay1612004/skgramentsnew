@@ -507,6 +507,22 @@ it('shows a real saved order confirmation and uses the customer-protected order 
   );
 });
 
+it('celebrates confirmed online payment but keeps unpaid orders clearly pending', async () => {
+  query = 'order=order-id';
+  mockApi(url => url.endsWith('/orders/order-id') ? json({ order: { ...order, paymentMethod: 'razorpay', paymentStatus: 'paid' } }) : undefined);
+  const view = render(<ExclusiveStore />);
+  expect(await screen.findByText('Payment confirmed')).toBeInTheDocument();
+  expect(screen.getByText('AMOUNT PAID')).toBeInTheDocument();
+  expect(view.container.querySelector('.ss-confirmation-confetti')).toBeInTheDocument();
+  view.unmount();
+
+  mockApi(url => url.endsWith('/orders/order-id') ? json({ order: { ...order, status: 'awaiting_payment', paymentMethod: 'razorpay' } }) : undefined);
+  const pendingView = render(<ExclusiveStore />);
+  expect(await screen.findByText('Payment pending')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Pay ₹1,059.00' })).toBeInTheDocument();
+  expect(pendingView.container.querySelector('.ss-confirmation-confetti')).not.toBeInTheDocument();
+});
+
 it('requires confirmation before cancelling an order and updates its saved status', async () => {
   query = 'order=order-id';
   const fetch = mockApi((url, options) => url.endsWith('/orders/order-id/cancel') && options.method === 'POST' ? json({ order: { ...order, status: 'cancelled' } }) : url.endsWith('/orders/order-id') ? json({ order }) : undefined);
@@ -540,6 +556,7 @@ it('applies and removes a coupon using server totals and submits the applied cod
   fireEvent.change(input, { target: { value: 'save10' } });
   fireEvent.click(screen.getByRole('button', { name: 'Apply coupon' }));
   expect(await screen.findByText('SAVE10 applied')).toBeInTheDocument();
+  expect(document.querySelector('.ss-coupon-burst')).toBeInTheDocument();
   expect(screen.getByText('−₹99.90')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Remove coupon' }));
   await waitFor(() => expect(screen.queryByText('SAVE10 applied')).not.toBeInTheDocument());
@@ -558,6 +575,7 @@ it('shows coupon errors without replacing the last valid server quote', async ()
   fireEvent.change(await screen.findByLabelText('Coupon code'), { target: { value: 'EXPIRED' } });
   fireEvent.click(screen.getByRole('button', { name: 'Apply coupon' }));
   expect(await screen.findByText('This coupon has expired.')).toBeInTheDocument();
+  expect(document.querySelector('.ss-coupon-burst')).not.toBeInTheDocument();
   expect(screen.getByText('₹1,059.00')).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Remove coupon' })).not.toBeInTheDocument();
 });

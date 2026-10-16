@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Banknote, MapPin, CreditCard, Check, ShieldCheck } from 'lucide-react';
+import { Banknote, MapPin, CreditCard, Check, ShieldCheck, PartyPopper } from 'lucide-react';
 import {
   StoreApiError,
   storeRequest,
@@ -39,6 +39,7 @@ export default function ExclusiveCheckout({
   const [couponCode, setCouponCode] = useState('');
   const [couponBusy, setCouponBusy] = useState(false);
   const [couponError, setCouponError] = useState('');
+  const [couponCelebration, setCouponCelebration] = useState(0);
   const couponPending = useRef(false);
   const pending = useRef(false);
   const requestId = useRef('');
@@ -126,6 +127,11 @@ export default function ExclusiveCheckout({
       if (!remove && !code) throw new Error('Enter a coupon code.');
       const result = await storeRequest<CheckoutQuote>('/checkout' + (code ? '?couponCode=' + encodeURIComponent(code) : ''));
       setQuote(result); setCouponCode(result.coupon?.code || ''); setError('');
+      if (!remove && result.coupon?.code === code && Number(result.discount) > 0) {
+        setCouponCelebration(value => value + 1);
+      } else if (remove) {
+        setCouponCelebration(0);
+      }
       setPaymentMethod(current => result.paymentMethods.includes(current) ? current : result.paymentMethods[0] || '');
       requestId.current = '';
     } catch (error) {
@@ -393,7 +399,11 @@ export default function ExclusiveCheckout({
               <label htmlFor="checkout-coupon">Coupon code</label>
               <input id="checkout-coupon" value={couponCode} maxLength={32} autoCapitalize="characters" autoComplete="off" disabled={busy || couponBusy} onChange={event => setCouponCode(event.target.value)} />
               <button type="submit" className="button outline" disabled={busy || couponBusy}>{couponBusy ? 'Updating…' : 'Apply coupon'}</button>
-              {quote.coupon && <><p role="status">{quote.coupon.code} applied</p><button type="button" className="ss-text-button" disabled={busy || couponBusy} onClick={() => void applyCoupon(true)}>Remove coupon</button></>}
+              {quote.coupon && <><div className="ss-coupon-success" role="status">
+                {couponCelebration > 0 && <span key={couponCelebration} className="ss-coupon-burst" aria-hidden="true">{Array.from({ length: 12 }, (_, index) => <i key={index} />)}</span>}
+                <span className="ss-coupon-success-icon"><PartyPopper size={20} aria-hidden="true" /></span>
+                <span><strong>{quote.coupon.code} applied</strong><small>You saved {price(quote.discount || 0, quote.currency)} on this order</small></span>
+              </div><button type="button" className="ss-text-button ss-coupon-remove" disabled={busy || couponBusy} onClick={() => void applyCoupon(true)}>Remove coupon</button></>}
               {couponError && <p className="ss-error" role="alert">{couponError}</p>}
             </form>
             <dl>
