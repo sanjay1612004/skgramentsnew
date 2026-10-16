@@ -1,10 +1,11 @@
 'use client';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Pencil, LogOut } from 'lucide-react';
-import { StoreApiError, storeRequest, type Customer } from '@/lib/store-api';
+import { Pencil, LogOut, Package } from 'lucide-react';
+import Link from 'next/link';
+import { StoreApiError, storeRequest, exclusiveLink, type Customer } from '@/lib/store-api';
 import CustomerAvatar from './customer-avatar';
 
-export default function ProfileActions({ customer, onSaved, onLogout, onExpired, loggingOut, logoutError }: { customer: Customer; onSaved: (customer: Customer) => void; onLogout: () => void; onExpired: () => void; loggingOut: boolean; logoutError: string }) {
+export default function ProfileActions({ customer, onSaved, onLogout, onExpired, onNavigate, loggingOut, logoutError }: { customer: Customer; onSaved: (customer: Customer) => void; onLogout: () => void; onExpired: () => void; onNavigate: () => void; loggingOut: boolean; logoutError: string }) {
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -28,7 +29,7 @@ export default function ProfileActions({ customer, onSaved, onLogout, onExpired,
       <label>Profile picture URL<input name="avatarUrl" type="url" defaultValue={customer.avatarUrl || ''} placeholder="https://…" /></label>
       {error && <p className="ss-error" role="alert">{error}</p>}
       <div className="ss-profile-form-buttons"><button type="button" className="button outline" onClick={() => setEditing(false)}>Cancel</button><button type="submit" className="button dark">{busy ? 'Saving…' : 'Save profile'}</button></div>
-    </fieldset></form> : <div className="ss-profile-menu"><button type="button" onClick={() => setEditing(true)} disabled={loggingOut}><Pencil size={18} aria-hidden="true" /> Edit profile</button><button type="button" onClick={onLogout} disabled={loggingOut}><LogOut size={18} aria-hidden="true" />{loggingOut ? 'Signing out…' : 'Sign out'}</button></div>}
+    </fieldset></form> : <div className="ss-profile-menu"><Link href={exclusiveLink({ orders: 1 })} onClick={onNavigate}><Package size={18} aria-hidden="true" />Your orders</Link><button type="button" onClick={() => setEditing(true)} disabled={loggingOut}><Pencil size={18} aria-hidden="true" /> Edit profile</button><button type="button" onClick={onLogout} disabled={loggingOut}><LogOut size={18} aria-hidden="true" />{loggingOut ? 'Signing out…' : 'Sign out'}</button></div>}
     {logoutError && <p className="ss-error" role="alert">{logoutError}</p>}
   </div>;
 }

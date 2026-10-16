@@ -12,6 +12,10 @@ import StoreDialog from './store-dialog';
 import CustomerAvatar from './customer-avatar';
 import ProfileActions from './profile-actions';
 import ProfilePopover from './profile-popover';
+import { useStoreCart } from './use-store-cart';
+import ExclusiveCheckout from './exclusive-checkout';
+import OrderConfirmation from './order-confirmation';
+import OrderHistory from './order-history';
 
 type Session = { status: 'checking' } | { status: 'guest' } | { status: 'error'; message: string } | { status: 'blocked'; message: string } | { status: 'authenticated'; customer: Customer };
 
@@ -21,6 +25,9 @@ export default function ExclusiveStore() {
   const category = params.get('category') || '';
   const product = params.get('product') || '';
   const showBag = params.get('bag') === '1';
+  const showCheckout = params.get('checkout') === '1';
+  const order = params.get('order') || '';
+  const showOrders = params.get('orders') === '1';
   const number = Number(params.get('page') || 1);
   const page = Number.isSafeInteger(number) && number > 0 ? number : 1;
   const [session, setSession] = useState<Session>({ status: 'checking' });
@@ -57,6 +64,7 @@ export default function ExclusiveStore() {
   }, [retry, acceptCustomer]);
 
   const expired = useCallback(() => { sessionGeneration.current++; setSession({ status: 'guest' }); setModal('login'); }, []);
+  const cart = useStoreCart(session.status === 'authenticated' ? session.customer._id : '', expired);
   async function logout() {
     if (loggingOut) return;
     setLoggingOut(true); setLogoutError('');
@@ -75,16 +83,16 @@ export default function ExclusiveStore() {
     <header className="ss-navigation">
       <Link href="/" className="logo" aria-label="THE SK APPARELS home">THE SK<span>APPARELS</span></Link>
       <nav aria-label="Exclusive store account" className="ss-navigation-actions">
-        {session.status === 'authenticated' ? <Link href={exclusiveLink({ bag: 1 })} className="ss-nav-icon" aria-label="Shopping bag"><ShoppingBag size={23} aria-hidden="true" /></Link> : <button type="button" className="ss-nav-icon" aria-label="Shopping bag" disabled={session.status === 'checking'} onClick={() => setModal('login')}><ShoppingBag size={23} aria-hidden="true" /></button>}
+        {session.status === 'authenticated' ? <Link href={exclusiveLink({ bag: 1 })} className="ss-nav-icon" aria-label="Shopping bag"><ShoppingBag size={23} aria-hidden="true" />{Boolean(cart.cart?.summary.itemCount) && <span className="ss-bag-dot" role="status" aria-label={`${cart.cart!.summary.itemCount} ${cart.cart!.summary.itemCount === 1 ? 'item' : 'items'} in bag`} />}</Link> : <button type="button" className="ss-nav-icon" aria-label="Shopping bag" disabled={session.status === 'checking'} onClick={() => setModal('login')}><ShoppingBag size={23} aria-hidden="true" /></button>}
         <div className="ss-profile-anchor" ref={profileAnchor}>
           <button type="button" className="ss-nav-profile" aria-label={session.status === 'authenticated' ? 'Open profile menu' : 'Sign in'} aria-haspopup="dialog" aria-expanded={modal === 'profile'} disabled={session.status === 'checking'} onClick={() => setModal(session.status === 'authenticated' ? modal === 'profile' ? null : 'profile' : 'login')}><CustomerAvatar customer={session.status === 'authenticated' ? session.customer : undefined} /></button>
-          {modal === 'profile' && session.status === 'authenticated' && <ProfilePopover anchor={profileAnchor} onClose={closeModal}><ProfileActions customer={session.customer} onSaved={acceptCustomer} onLogout={logout} onExpired={expired} loggingOut={loggingOut} logoutError={logoutError} /></ProfilePopover>}
+          {modal === 'profile' && session.status === 'authenticated' && <ProfilePopover anchor={profileAnchor} onClose={closeModal}><ProfileActions customer={session.customer} onSaved={acceptCustomer} onLogout={logout} onExpired={expired} onNavigate={closeModal} loggingOut={loggingOut} logoutError={logoutError} /></ProfilePopover>}
         </div>
       </nav>
     </header>
     <main id="main" className="ss-page">
       {session.status === 'checking' ? <div className="ss-loading" role="status">Checking your account…</div> : session.status === 'guest' ? <div className="ss-guest"><p>Sign in to browse the exclusive collection.</p><button type="button" className="button dark" onClick={() => setModal('login')}>Sign in</button></div> : session.status === 'error' || session.status === 'blocked' ? <div className="ss-message" role="alert"><h2>{session.status === 'blocked' ? 'Customer access only.' : 'Let’s try that again.'}</h2><p>{session.message}</p><button className="button dark" onClick={() => setRetry((value) => value + 1)}>Try again</button><button className="button outline" onClick={() => setModal('login')}>Use another account</button></div> : <>
-        {showBag ? <SharedBag onExpired={expired} /> : product ? <ExclusiveProduct key={product} identifier={product} onExpired={expired} /> : <ExclusiveCatalog key={`${category}:${page}`} category={category} page={page} onExpired={expired} />}
+        {order ? <OrderConfirmation key={order} identifier={order} onExpired={expired} /> : showOrders ? <OrderHistory key={page} page={page} onExpired={expired} /> : showCheckout ? <ExclusiveCheckout onExpired={expired} cartResource={cart} /> : showBag ? <SharedBag resource={cart} /> : product ? <ExclusiveProduct key={product} identifier={product} onExpired={expired} onAdd={cart.addItem} cartBusy={Boolean(cart.busy)} /> : <ExclusiveCatalog key={`${category}:${page}`} category={category} page={page} onExpired={expired} />}
       </>}
     </main>
     {modal === 'login' && <StoreDialog title="Your account" onClose={closeModal}><AuthForm onSignedIn={acceptCustomer} /></StoreDialog>}

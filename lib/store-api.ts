@@ -27,7 +27,8 @@ export async function storeRequest<T>(path: string, options: RequestInit = {}): 
   return body as T;
 }
 
-export type Customer = { _id: string; firstName: string; lastName: string; emailId: string; roles: string[]; avatarUrl?: string | null; phone?: string };
+export type Address = { _id: string; label?: string; recipientName: string; phone: string; addressLine1: string; addressLine2?: string; landmark?: string; city: string; state: string; postalCode: string; countryCode: string; isDefaultShipping?: boolean };
+export type Customer = { _id: string; firstName: string; lastName: string; emailId: string; roles: string[]; avatarUrl?: string | null; phone?: string; addresses?: Address[] };
 export type CatalogImage = { url: string; altText?: string; isPrimary?: boolean };
 export type Category = { _id: string; name: string; slug: string; description?: string; image?: CatalogImage; productCount?: number };
 export type Variant = {
@@ -43,11 +44,13 @@ export type Product = {
 };
 export type ProductList = { data: Product[]; pagination: { page: number; pages: number; total: number } };
 export type CartItem = {
-  variantId: string; quantity: number; lineTotal: number; currency: string; available: boolean; maxQuantity: number;
+  variantId: string; quantity: number; unitPrice: number | null; compareAtPrice?: number | null; lineTotal: number | null; currency: string | null; available: boolean; maxQuantity: number;
   product: { name: string; slug: string; isSecret: boolean; image?: CatalogImage } | null;
   variant?: { sku: string; options?: Variant['options'] }; issue?: { message: string };
 };
-export type Cart = { items: CartItem[]; summary: { itemCount: number; subtotal: number; currency: string | null } };
+export type Cart = { items: CartItem[]; summary: { itemCount: number; subtotal: number; currency: string | null; discountTotal: number; checkoutEligible: boolean; issueCount: number } };
+export type CheckoutQuote = { cart: Cart; quoteToken: string; shipping: number; total: number; currency: string; countryCode: string; paymentMethods: string[] };
+export type Order = { _id: string; number: string; status: string; paymentMethod: string; paymentStatus: string; shippingAddress: Address; currency: string; subtotal: number; shipping: number; total: number; createdAt: string; items: { variantId: string; name: string; color?: string; size?: string; quantity: number; unitPrice: number; lineTotal: number }[] };
 
 export function price(amount: number | undefined, currency = 'INR') {
   return Number.isFinite(amount) ? new Intl.NumberFormat('en-IN', { style: 'currency', currency }).format(amount! / 100) : 'Price unavailable';

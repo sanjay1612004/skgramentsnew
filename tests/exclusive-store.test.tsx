@@ -12,6 +12,7 @@ vi.mock('next/link', () => ({ default: (props: AnchorHTMLAttributes<HTMLAnchorEl
 const customer = { _id: 'customer', firstName: 'Sanjay', lastName: 'Customer', emailId: 'customer@example.com', roles: ['customer'], avatarUrl: 'https://example.com/profile.jpg' };
 const category = { _id: 'tees', name: 'Private tees', slug: 'private-tees', productCount: 1, image: { url: 'https://example.com/tees.png', altText: 'Cotton tees category' } };
 const product = { _id: 'product', name: 'Secret cotton tee', slug: 'secret-cotton-tee', shortDescription: 'Cotton', description: 'A cotton tee.', images: [], primaryCategory: category, variants: [{ _id: 'variant', sku: 'SK-M', status: 'active', pricing: { currency: 'INR', price: 99900 }, inventory: { trackQuantity: true, quantity: 2 }, options: { color: { name: 'Black' }, size: 'M' } }], priceRange: { minimum: 99900 } };
+const emptyCart = { items: [], summary: { itemCount: 0, subtotal: 0, currency: null, discountTotal: 0, checkoutEligible: false, issueCount: 0 } };
 function response(body: unknown, status = 200) { return Promise.resolve(new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })); }
 beforeEach(() => { query = ''; replaceRoute.mockClear(); vi.stubEnv('NEXT_PUBLIC_STORE_API_URL', 'http://localhost:1234'); });
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
@@ -86,12 +87,12 @@ it('adds the selected variant to the shared server bag with quantity, without tr
   const fetch = vi.fn((url: string) => {
     if (url.endsWith('/profile')) return response(customer);
     if (url.includes('/exclusive-store/products/')) return response(product);
-    return response({ cart: { items: [] } });
+    return response({ cart: emptyCart });
   });
   vi.stubGlobal('fetch', fetch);
   render(<ExclusiveStore />);
   fireEvent.click(await screen.findByRole('button', { name: 'Add to your bag' }));
-  expect(await screen.findByText(/Added to your shared bag/)).toBeInTheDocument();
+  expect(await screen.findByText(/Added to your bag/)).toBeInTheDocument();
   expect(fetch).toHaveBeenCalledWith('http://localhost:1234/cart/items', expect.objectContaining({ credentials: 'include', method: 'POST', body: JSON.stringify({ variantId: 'variant', quantity: 1 }) }));
 });
 
@@ -112,7 +113,7 @@ it('clearly marks a zero-stock product as sold out and prevents bag requests', a
 it('updates stock and price for the selected option and supports gallery navigation', async () => {
   query = 'product=secret-cotton-tee';
   const multiOption = { ...product, images: [{ url: 'https://example.com/front.jpg', altText: 'Front' }, { url: 'https://example.com/back.jpg', altText: 'Back' }], variants: [product.variants[0], { ...product.variants[0], _id: 'large', options: { color: { name: 'Black' }, size: 'L' }, pricing: { currency: 'INR', price: 109900 }, inventory: { trackQuantity: true, quantity: 5, reserved: 2 } }] };
-  const fetch = vi.fn((url: string) => url.endsWith('/profile') ? response(customer) : url.endsWith('/cart/items') ? response({ cart: { items: [] } }) : response(multiOption));
+  const fetch = vi.fn((url: string) => url.endsWith('/profile') ? response(customer) : url.endsWith('/cart/items') || url.endsWith('/cart') ? response({ cart: emptyCart }) : response(multiOption));
   vi.stubGlobal('fetch', fetch);
   render(<ExclusiveStore />);
   expect(await screen.findByText('5 in stock across all options')).toBeInTheDocument();
@@ -126,7 +127,7 @@ it('updates stock and price for the selected option and supports gallery navigat
   fireEvent.click(screen.getByRole('button', { name: 'Next product image' }));
   expect(screen.getByAltText('Front')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Add to your bag' }));
-  await screen.findByText(/Added to your shared bag/);
+  await screen.findByText(/Added to your bag/);
   expect(fetch).toHaveBeenCalledWith('http://localhost:1234/cart/items', expect.objectContaining({ body: JSON.stringify({ variantId: 'large', quantity: 1 }) }));
 });
 

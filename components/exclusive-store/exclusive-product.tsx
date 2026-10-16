@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
 import { StoreApiError, storeRequest, exclusiveLink, price, available, stockAvailability, type Product, type Cart } from '@/lib/store-api';
 
-export default function ExclusiveProduct({ identifier, onExpired }: { identifier: string; onExpired: () => void }) {
+export default function ExclusiveProduct({ identifier, onExpired, onAdd, cartBusy }: { identifier: string; onExpired: () => void; onAdd: (variantId: string) => Promise<Cart>; cartBusy: boolean }) {
   const [product, setProduct] = useState<Product | null>(null);
   const [error, setError] = useState('');
   const [variantId, setVariantId] = useState('');
@@ -28,9 +28,9 @@ export default function ExclusiveProduct({ identifier, onExpired }: { identifier
   }, [identifier, retry, onExpired]);
   const variant = product?.variants.find((item) => item._id === variantId);
   async function addToBag() {
-    if (!variant || !available(variant) || busy) return;
+    if (!variant || !available(variant) || busy || cartBusy) return;
     setBusy(true); setError(''); setAdded(false);
-    try { await storeRequest<{ cart: Cart }>('/cart/items', { method: 'POST', body: JSON.stringify({ variantId, quantity: 1 }) }); setAdded(true); }
+    try { await onAdd(variantId); setAdded(true); }
     catch (error) { if (error instanceof StoreApiError && error.status === 401) onExpired(); else setError(error instanceof Error ? error.message : 'Could not add to your bag.'); }
     finally { setBusy(false); }
   }
@@ -60,8 +60,8 @@ export default function ExclusiveProduct({ identifier, onExpired }: { identifier
         {soldOut && <p className="ss-help">This piece is currently sold out.</p>}
         {error && <p className="ss-error" role="alert">{error}</p>}
         {!variant && !soldOut && <p className="ss-help">Choose an available option to add this piece.</p>}
-        {added && <p className="ss-success" role="status">Added to your shared bag. <Link href={exclusiveLink({ bag: 1 })}>View your bag →</Link></p>}
-        <div className="ss-purchase"><div className="ss-purchase-price"><span>{price(amount, currency)}</span><small>{variant ? `${variant.options?.color?.name || 'Standard'} / ${variant.options?.size || variant.title || 'One size'}` : soldOut ? 'Sold out' : 'Choose an option'}</small></div><button type="button" className="button dark full" disabled={!variant || !available(variant) || busy} onClick={addToBag}><ShoppingBag size={18} aria-hidden="true" />{busy ? 'Adding…' : soldOut ? 'Sold out' : 'Add to your bag'}</button></div>
+        {added && <p className="ss-success" role="status">Added to your bag. <Link href={exclusiveLink({ bag: 1 })}>View your bag →</Link></p>}
+        <div className="ss-purchase"><div className="ss-purchase-price"><span>{price(amount, currency)}</span><small>{variant ? `${variant.options?.color?.name || 'Standard'} / ${variant.options?.size || variant.title || 'One size'}` : soldOut ? 'Sold out' : 'Choose an option'}</small></div><button type="button" className="button dark full" disabled={!variant || !available(variant) || busy || cartBusy} onClick={addToBag}><ShoppingBag size={18} aria-hidden="true" />{busy ? 'Adding…' : soldOut ? 'Sold out' : 'Add to your bag'}</button></div>
         <details className="ss-description"><summary>Product details</summary><p>{product.description}</p></details>
       </div>
     </div>

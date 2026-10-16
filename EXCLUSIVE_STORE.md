@@ -74,10 +74,41 @@ Category/product/page query parameters keep deep links and back navigation compa
 with static export, without generating private products during the build. The page is
 marked noindex and uses the site's existing cream, forest-green and lime styling.
 
-The shared bag supports adding variants, changing quantity and removing items. Shipping
-and payment remain separate; no checkout or payment service is introduced.
+The shared bag supports adding variants, changing quantity, removing items and an orange
+dot on the navbar bag icon while it contains items. The dot updates immediately after
+adding/removing items and clears when the bag is empty. It refreshes when opening the bag or returning to the browser tab. Failed
+updates retain the existing items, and unavailable items must be fixed before checkout.
+
+Checkout uses `/exclusive-store/?checkout=1`, with saved customer addresses or a new
+address saved through `/profile/addresses`. Delivery is **₹60 per order within India**,
+with INR pricing and a six-digit Indian PIN code. The customer reviews the items, address
+and total before placing a **cash-on-delivery** order. Online payment is deferred until
+a provider is selected; no online payment or card fields are presented.
+
+The API's `/checkout` quote supplies the prices and delivery total. `POST /orders`
+rechecks that quote, active products, stock and address, then saves the order, deducts
+sellable stock and clears the cart in one MongoDB transaction. A changed price or bag
+requires a fresh review. Repeating a request uses the same request ID so a lost network
+response cannot create a duplicate order. Confirmation uses
+`/exclusive-store/?order=<id>` and retrieves the customer's saved order from the API.
+No customer address or login token is placed in the URL or localStorage.
+
+The profile menu includes **Your orders**, opening `/exclusive-store/?orders=1`.
+Customers see their own orders newest first, with date, items, total and status, and can
+open an order to view its items and delivery details. Lists are paginated in batches of
+10; the API scopes every list and detail request to the signed-in customer.
+
+Restart/deploy the updated `store-api` before trying checkout, then rebuild/deploy this
+frontend with its existing `NEXT_PUBLIC_STORE_API_URL`. No payment-provider credentials
+or new environment variables are needed for cash on delivery. Orders are saved in the
+shared MongoDB `orders` collection. Staff order-management screens, courier integrations,
+online payment and refunds are outside this implementation. The mobile admin reads
+these shared orders and supports push alerts through admin-api. See
+`../store-api/CHECKOUT.md` for endpoint details and backend verification.
 
 Product cards show total sellable stock across active variants, after reservations.
+Customers can cancel their own unpaid COD orders before shipping from order details,
+after confirmation. Cancelled orders update their status and restore recorded stock once.
 Selecting a colour and size on the product page shows that option's stock and price.
 Untracked inventory displays “In stock”; zero-stock backorders are labelled explicitly.
 The mobile layout uses compact round categories, a two-column product grid, a contained
