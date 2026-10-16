@@ -17,6 +17,7 @@ import { useStoreCart } from './use-store-cart';
 import ExclusiveCheckout from './exclusive-checkout';
 import OrderConfirmation from './order-confirmation';
 import OrderHistory from './order-history';
+import ExclusiveSkeleton from './exclusive-skeleton';
 
 type Session = { status: 'checking' } | { status: 'guest' } | { status: 'error'; message: string } | { status: 'blocked'; message: string } | { status: 'authenticated'; customer: Customer };
 
@@ -30,6 +31,7 @@ export default function ExclusiveStore() {
   const order = params.get('order') || '';
   const showOrders = params.get('orders') === '1';
   const invitation = params.get('invite') || '';
+  const loadingVariant = invitation ? 'invitation' : product || showBag || showCheckout || order || showOrders ? 'opening' : category ? 'products' : 'categories';
   const number = Number(params.get('page') || 1);
   const page = Number.isSafeInteger(number) && number > 0 ? number : 1;
   const [session, setSession] = useState<Session>({ status: 'checking' });
@@ -98,7 +100,7 @@ export default function ExclusiveStore() {
       </nav>
     </header>
     <main id="main" className="ss-page">
-      {session.status === 'checking' ? <div className="ss-loading" role="status">Checking your account…</div> : invitation && session.status === 'guest' ? <InvitationForm token={invitation} onAccepted={acceptInvitation} /> : session.status === 'guest' ? <div className="ss-guest"><p>Sign in to browse the exclusive collection.</p><button type="button" className="button dark" onClick={() => setModal('login')}>Sign in</button></div> : session.status === 'error' || session.status === 'blocked' ? <div className="ss-message" role="alert"><h2>{session.status === 'blocked' ? 'Customer access only.' : 'Let’s try that again.'}</h2><p>{session.message}</p><button className="button dark" onClick={() => setRetry((value) => value + 1)}>Try again</button><button className="button outline" onClick={() => setModal('login')}>Use another account</button></div> : <>
+      {session.status === 'checking' ? <ExclusiveSkeleton variant={loadingVariant} /> : invitation && session.status === 'guest' ? <InvitationForm token={invitation} onAccepted={acceptInvitation} /> : session.status === 'guest' ? <div className="ss-guest"><p>Sign in to browse the exclusive collection.</p><button type="button" className="button dark" onClick={() => setModal('login')}>Sign in</button></div> : session.status === 'error' || session.status === 'blocked' ? <div className="ss-message" role="alert"><h2>{session.status === 'blocked' ? 'Customer access only.' : 'Let’s try that again.'}</h2><p>{session.message}</p><button className="button dark" onClick={() => setRetry((value) => value + 1)}>Try again</button><button className="button outline" onClick={() => setModal('login')}>Use another account</button></div> : <>
         {order ? <OrderConfirmation key={order} identifier={order} onExpired={expired} /> : showOrders ? <OrderHistory key={page} page={page} onExpired={expired} /> : showCheckout ? <ExclusiveCheckout onExpired={expired} cartResource={cart} /> : showBag ? <SharedBag resource={cart} /> : product ? <ExclusiveProduct key={product} identifier={product} onExpired={expired} onAdd={cart.addItem} cartBusy={Boolean(cart.busy)} /> : <ExclusiveCatalog key={`${category}:${page}`} category={category} page={page} onExpired={expired} />}
       </>}
     </main>

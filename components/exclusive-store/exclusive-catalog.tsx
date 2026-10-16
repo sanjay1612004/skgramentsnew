@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { LockKeyhole } from 'lucide-react';
 import { StoreApiError, storeRequest, exclusiveLink, price, stockAvailability, type Category, type ProductList } from '@/lib/store-api';
+import ExclusiveSkeleton from './exclusive-skeleton';
 
 type State = { loading: boolean; error: string; categories: Category[]; category?: Category; list?: ProductList };
 export default function ExclusiveCatalog({ category, page, onExpired }: { category: string; page: number; onExpired: () => void }) {
@@ -32,8 +33,8 @@ export default function ExclusiveCatalog({ category, page, onExpired }: { catego
     void load();
     return () => controller.abort();
   }, [category, page, retry, onExpired]);
-  if (state.loading) return <div className="ss-loading" role="status">Finding the pieces…</div>;
-  if (state.error) return <section className="ss-message" role="alert"><p>{state.error}</p><button className="button dark" onClick={() => setRetry((value) => value + 1)}>Try again</button></section>;
+  if (state.loading) return <ExclusiveSkeleton variant={category ? 'products' : 'categories'} />;
+  if (state.error) return <section className="ss-message" role="alert"><p>{state.error}</p><button className="button dark" onClick={() => { setState((previous) => ({ ...previous, loading: true, error: '' })); setRetry((value) => value + 1); }}>Try again</button></section>;
 
   return <section className="ss-catalog" aria-label={category ? 'Exclusive products' : 'Exclusive collections'}>
     {category && <div className="ss-section-top ss-category-heading"><div><h2>{state.category?.name}</h2>{state.category?.description && <p>{state.category.description}</p>}</div></div>}
