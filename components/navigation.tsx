@@ -31,7 +31,7 @@ export default function Navigation() {
  const isJallikattu = pathname?.replace(/\/$/, '') === '/jersey-t-shirt-for-jallikattu';
  const isExclusiveStore = ['/exclusive-store', '/secret-store', '/secrete-store'].includes(pathname?.replace(/\/$/, '') || '');
  if (isExclusiveStore) return null;
- const contactActions = <div className="floating-contact-actions" aria-label="Contact THE SK APPARELS">{site.contact.whatsapp && <a className="floating-whatsapp" href={isJallikattu ? getWhatsAppUrl('Hi THE SK APPARELS, I would like to enquire about Jallikattu jersey T-shirts and get a quote.') : getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" aria-label="Chat with THE SK APPARELS on WhatsApp" title="Chat on WhatsApp"><WhatsAppIcon /></a>}<button type="button" className="floating-shop" onClick={()=>modal.openQuote(isJallikattu ? { product: 'Jallikattu jersey T-shirt' } : undefined)}>GET A QUOTE <span>✳</span></button></div>;
+ const contactActions = <div className="floating-contact-actions" aria-label="Contact THE SK APPARELS">{site.contact.whatsapp && <a className="floating-whatsapp" href={isJallikattu ? getWhatsAppUrl('Hi THE SK APPARELS, I would like to enquire about Jallikattu jersey T-shirts and get a quote.') : getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" aria-label="Chat with THE SK APPARELS on WhatsApp" title="Chat on WhatsApp"><WhatsAppIcon /></a>}<button type="button" className="floating-shop" onClick={()=>modal.openQuote(isJallikattu ? { product: 'Jallikattu jersey T-shirt' } : undefined)}>GET A QUOTE </button></div>;
  if (isJallikattu) {
   return <>
    <a href="#main" className="skip-link">Skip to content</a>

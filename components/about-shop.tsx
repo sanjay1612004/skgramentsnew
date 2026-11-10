@@ -57,7 +57,7 @@ export default function AboutShop({ children }: { children?: ReactNode }) {
         <div className="about-shop-gallery">
           <div className="about-shop-gallery-grid" aria-hidden="true" />
           {photos.map((photo, index) => <ShopPhoto key={photo.src} index={index} progress={scrollYProgress} />)}
-          <motion.div className="about-shop-seal" initial={reduced ? false : { opacity: 0, scale: .85, rotate: -12 }} whileInView={{ opacity: 1, scale: 1, rotate: -7 }} viewport={{ once: true }} transition={{ duration: .8, delay: .25, ease }} aria-hidden="true"><span>SK</span><small>OUR PLACE.<br />OUR CRAFT.</small><b>✳</b></motion.div>
+          <motion.div className="about-shop-seal" initial={reduced ? false : { opacity: 0, scale: .85, rotate: -12 }} whileInView={{ opacity: 1, scale: 1, rotate: -7 }} viewport={{ once: true }} transition={{ duration: .8, delay: .25, ease }} aria-hidden="true"><span>SK</span><small>OUR PLACE.<br />OUR CRAFT.</small></motion.div>
           <p className="about-shop-gallery-note">A LOOK INSIDE THE PLACE WE CALL HOME.</p>
         </div>
       </div>

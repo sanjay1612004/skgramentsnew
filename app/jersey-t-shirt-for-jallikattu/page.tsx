@@ -87,12 +87,12 @@ export default function JallikattuPage() {
         <figure className="jk-hero-visual">
           <Image src={`${imageRoot}/jallikattu-black-bull-jersey.webp`} alt={designs[0].alt} width={1200} height={1500} sizes="(max-width: 760px) 100vw, 50vw" priority fetchPriority="high" />
           <div className="jk-image-top"><span>HERITAGE, REIMAGINED.</span><span>SK / 01</span></div>
-          <div className="jk-image-seal" aria-label="Tamil roots, modern spirit"><span>TAMIL ROOTS</span><span aria-hidden="true">✳</span><span>MODERN SPIRIT</span></div>
+          <div className="jk-image-seal" aria-label="Tamil roots, modern spirit"><span>TAMIL ROOTS</span><span>MODERN SPIRIT</span></div>
           <figcaption>THE SIGNATURE BULL <span>CHARCOAL / GOLD</span></figcaption>
         </figure>
       </section>
 
-      <div className="jk-wordmark" aria-hidden="true"><span>HERITAGE</span><i>✳</i><span>IDENTITY</span><i>✳</i><span>PRIDE</span><i>✳</i><span>JALLIKATTU</span></div>
+      <div className="jk-wordmark" aria-hidden="true"><span>HERITAGE</span><span>IDENTITY</span><span>PRIDE</span><span>JALLIKATTU</span></div>
 
       <section className="jk-intro jk-section" aria-labelledby="jk-intro-title">
         <div className="jk-section-label"><span>01 / THE INSPIRATION</span><span lang="ta">வீரம் · மரபு · அடையாளம்</span></div>

@@ -212,7 +212,7 @@ export default function QuoteDialog({ details, close }: { details: QuoteDetails;
         <aside className="quote-brand" aria-hidden="true">
           <span className="quote-brand-orbit orbit-one" /><span className="quote-brand-orbit orbit-two" />
           <div className="quote-brand-label">THE SK APPARELS <span>TIRUPPUR</span></div>
-          <span className="quote-brand-star">✳</span>
+
           <div className="quote-brand-copy"><span>MADE FOR YOUR NEXT IDEA.</span><p><span className="quote-brand-line"><span>Let’s make</span></span><span className="quote-brand-line"><span>something</span></span><span className="quote-brand-line"><span><em>worth wearing.</em></span></span></p></div>
           <div className="quote-brand-bottom"><span>GOOD FITS. GREAT POSSIBILITIES.</span><span>SK / 01</span></div>
         </aside>
