@@ -184,3 +184,10 @@ body:has(.quote-modal[open]){overflow:hidden}
 .graphic-model{contain:layout paint}.graphic-model-poster{position:absolute;inset:0;pointer-events:none;transition:opacity .3s,visibility .3s}.graphic-model-poster img{object-fit:contain}.graphic-model .graphic-model-viewer{opacity:0;transition:opacity .3s}.graphic-model[data-status="ready"] .graphic-model-poster{opacity:0;visibility:hidden}.graphic-model[data-status="ready"] .graphic-model-viewer{opacity:1}.graphic-model .graphic-model-status{inset:auto 12px 12px;padding:8px 12px;font-size:.8125rem;min-height:36px}.graphic-model-status button{pointer-events:auto;text-decoration:underline;text-underline-offset:3px;padding:6px}.graphic-model[data-status="error"] .graphic-model-status{background:var(--lavender)}@media(prefers-reduced-motion:reduce){.graphic-model-poster,.graphic-model .graphic-model-viewer{transition:none}}
 
 .hero-title .hero-brand{display:block;margin:0 0 18px;font-family:var(--body);font-size:clamp(.75rem,1vw,.875rem);font-weight:600;line-height:1.4;letter-spacing:.12em}
+
+/* Airoke studio entry point in desktop and mobile navigation. */
+.nav-airoke{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0;padding:10px 16px;border:1px solid currentColor;border-radius:100px;font-size:.8125rem;font-weight:600;white-space:nowrap;transition:background .2s,color .2s}
+.nav-airoke:hover,.mobile-airoke:hover{background:var(--ink);color:var(--cream)}
+.mobile-airoke{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border:1px solid var(--ink);border-radius:100px;font-size:.875rem;font-weight:600}
+@media(max-width:960px){.navigation .desktop-nav{display:none}.navigation .mobile-menu-button{display:grid}}
+@media(max-width:760px){.navigation .nav-actions{gap:12px}.nav-airoke{padding:9px 13px;font-size:.75rem}}
